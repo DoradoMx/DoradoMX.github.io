@@ -1,0 +1,1697 @@
+{
+  "version": 1,
+  "collection": {
+    "5c9b9790-752d-5ff0-9a7f-76f7fc1df8de": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-18"
+    },
+    "c0df7928-e27b-527e-bc98-697b60b7eecf": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-07-27"
+    },
+    "b8cd8156-4612-57be-87a3-63178635045a": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-07-27"
+    },
+    "d8ce4bd7-3fbf-5387-8021-98e365e1e1a7": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-27"
+    },
+    "f1b3096c-eae7-5609-b95f-a8db0bde4ad8": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-27"
+    },
+    "245f5ef2-eb12-5991-a32c-0e83ea1f6dbc": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "eed7ebaa-94e5-52c3-9a11-454295b05b3c": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-27"
+    },
+    "d9bfa9fb-d33f-5c69-a624-3c9b3c89b18c": {
+      "variants": {
+        "normal": 4
+      },
+      "acquired": "2026-07-27"
+    },
+    "8af6e019-ec35-5b76-9d30-14f2cd617d25": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-27"
+    },
+    "fc990d5e-6c99-52ec-9ed0-bde1a579ca94": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-07-27"
+    },
+    "f6da7be8-3253-599c-8530-e2b6e0210b22": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "5861acc6-ed92-5ed4-817b-ee4495207c2c": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-07-27"
+    },
+    "58ae3328-44e6-52db-af4c-fdf62ec1f351": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-07-27"
+    },
+    "2dd5bbe6-0f2d-5ca4-9640-6c5b1c8af341": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-07-27"
+    },
+    "3cfdeba9-c1a7-57da-a953-36ba300e44b2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ebba7cd7-6be4-54d3-bd3d-cace5796d19c": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "7e01f5a5-9117-53a9-85c6-1bba8e31cec6": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "8cf71c3b-1e76-5304-ab70-306f1da5be91": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "bb40b74b-98a2-57d8-a020-35a4b4254bc2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a7853398-d58c-52ac-a0b8-c7c25d1096ed": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "8ab5291f-c355-5f18-8631-3e75b78e29ac": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "060cbb8d-361e-5dac-8eb3-08651495c64a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "50bbe51c-4c84-5f6e-a683-272db4ac8fdb": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0339cd02-2309-52a3-bbd3-0d70b987be45": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d0a019fb-81d6-5437-aa19-d4ac8093c7ec": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "dd335e12-c2df-5534-91f8-8656376f8b05": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "61549b88-4d44-5598-b60c-3c811d48835e": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "f4bafa8f-02dc-52d3-a034-e9b128b9ae62": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "117134db-13ba-5d4e-bb91-a0d9162946e9": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "2280c14b-170c-56e3-aba5-0e07baffb74c": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "a5c2e802-5ab7-5910-bcb8-f79cc0acde59": {
+      "variants": {
+        "normal": 5
+      },
+      "acquired": "2026-08-08"
+    },
+    "fc9a92e4-f365-5224-9c67-1888413de6d9": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7139e410-cbff-55eb-a5f5-e5866ec34e89": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "be186ca8-f1ee-5d86-ab8d-37ec26b7de56": {
+      "variants": {
+        "normal": 3
+      },
+      "acquired": "2026-08-08"
+    },
+    "c70545bf-2372-542f-883b-3d012fa7dfa1": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "22b55ffc-f62d-5bcd-8251-305be05be876": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "07ebe68a-702f-5937-9abe-9b404dfdf16a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0e3a5f16-beb3-5246-8780-ff1e29008d34": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "275aecd1-1dcd-5e74-9208-0472e1d8989d": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c0871e19-047a-5ed9-8e0b-28937ddd7c35": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7c5381f2-155c-5ca6-a779-7da79e71ba1e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "530f3161-754a-5798-ba8d-2f3213ea973f": {
+      "variants": {
+        "normal": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "9de46abc-0571-5c65-983f-6ca92f948472": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "48002676-b1ec-5556-beac-244827d98837": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1c244dc3-ad42-5fe8-8e03-f82b837dbef0": {
+      "variants": {
+        "foil": 1,
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "20983c0b-0835-59ad-88f1-5637638752f5": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "78b8d003-3613-5970-a9e4-59e67cd85947": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b0f05075-8e8c-5856-899c-03408d2ae08f": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d5b1bd80-83dc-5183-ae03-5eea98daa59a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0c6af13a-c7ec-52dd-bcb8-2e6f029206fc": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "606b075b-c298-55bb-88f9-607c5459a7e0": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c17733c3-4895-5f2a-90df-9d5feb5c7b50": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "8073c26b-68b8-503c-bd30-7986f6e1a451": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "361bc345-3a52-53e6-835b-88371a0fbbbe": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "51d2fe28-21d8-5cd8-802f-b727ef8c04de": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "29dd623c-82ac-56f9-9477-3c3f9b57b2ec": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "71a3004d-bfc9-50ce-93e4-f17acd037a2e": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c261f3f7-7c1d-55d5-830b-35bed8d6b708": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7e3d2a2b-89fe-51b9-9d6e-2d4ee4467726": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "47197f16-300e-53ce-95e6-4166a593279a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "66d00353-b8d9-5b20-bf29-0c5ea9fc778c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "82f200ea-32fa-57cc-8df1-5112443a3236": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "4cecb896-8104-5bbf-b196-a4f2c4feac37": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "44f31697-807c-522b-aba6-b9661a88cf14": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "4aace9c1-8be6-5513-aa49-7f5db452ce1a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "887f757a-2cb9-5d14-82f8-63941814445e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "f73e62c1-0c2c-5243-8288-3fe53deb4acf": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "00cfc7b5-4d16-573f-9a47-71a6b9ead6be": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "5b5223e8-b6f7-5bbd-bbea-4c2f375e4103": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7e3da405-d3d2-5cb1-9330-c5875e0bb0d2": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ea105b83-e332-5ed8-8448-aa96bb847599": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b821082b-e50b-5994-af09-1269d2d6506e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "95d3aa51-4a3a-5c22-98d1-2bb69da59c45": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "9369b814-c3ab-53e5-9f71-bfa507b10b70": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a8640f60-afac-5aa1-98d0-18247d15ddc8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a1e14f3c-4d24-504b-8ceb-bc9178aadbc3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a696e354-52b0-5c14-9bf4-e023c2201a6e": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "02df96a4-2439-57f5-be07-ca2f837770de": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "df254e69-f265-54fd-a1e4-b34f892b5ce5": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "67d52b3c-bfa6-562c-9860-699e62f43c70": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d26f8b13-5eef-5c43-9cf4-b0d3117069c4": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1036bdfc-e8c2-53df-b9eb-3861e91ce6ff": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d679ed63-1a06-5b34-baf4-9a838f24a4c3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "4e0a30de-7dd0-5a5f-ab17-b445a15d0c27": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d32c65e0-8946-5c3f-8464-d7613fbb8197": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "bdfdeef3-4cab-5c2c-b4d2-76f111033335": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "f73623f4-fc5e-5e33-8456-8bf0340fd723": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "87c67d20-80d2-5511-ba15-bc62a24cd6fb": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "00999e91-6b43-504e-8f89-aa3c8c3bac2c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "41b7a065-4fc9-588b-adbc-b60ae88f6f15": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "10debf8a-9668-580b-aba1-960190e4c8af": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "bce74fab-1211-5c68-b1ac-c71986307b42": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "e0692b4a-616f-58e2-97ea-16447fd8e6b3": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "011ff4b6-74be-5816-b2a3-bb817b05b0ea": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d2d8b12b-04ea-5220-8114-1b89eef0cd2f": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "14407ccb-d7ea-5b02-bedf-992c4712de38": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ef8f5c2b-3420-5d69-b267-c93e840b7c38": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "03f415a2-743e-5b79-9800-5ffd10c3faf7": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "dd615ff5-d097-5b19-ad26-3ca1b4e675e1": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ffb7127b-ee02-58f7-a659-49d01c29533e": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "6b979096-b7e7-5be2-ba11-9a8bcf2332c4": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1f1d3541-4290-5bf2-9693-c426c6be1bfa": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "5bd4f254-3043-5c21-979b-e06a58ae5d6e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1c5d258e-7745-5c3b-b7fa-939cc81c5e7f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d186a737-e0c3-50b9-90b9-66ae8c4f25e0": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "040415d8-b275-592d-9065-16f540fe47b3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "140959fd-d014-5012-92a9-93feb38804a7": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ef23230d-1a54-5c41-8908-ecb5b0bcbc58": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "8e52c609-c042-563b-9420-7074996b0d6f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7ab9b037-5b6c-5065-95b3-4530031f8835": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "e14ddc2f-4254-586d-98e1-00ef320409ca": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0d79aa3f-1c82-55fa-ba5a-44a3a8531d2e": {
+      "variants": {
+        "foil": 2
+      },
+      "acquired": "2026-08-08"
+    },
+    "682d7f4c-be63-5455-b83a-9e56cd9e6c11": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d555a929-b074-5474-a402-3b4cfb860132": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "2dbe0884-db67-5151-85c1-f8dfcb2a76ac": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a207897f-adef-5e5f-b55f-cac5b50952ee": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a263a643-bce6-531e-86b5-73fe97555a5f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "69a9340b-08d3-5f6b-b344-35804642019f": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "87fcb4e1-b324-5c41-ae29-9a521875fe5c": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "ae52222b-52bb-5855-8e13-50e94ae600f1": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "8bc12326-5ec6-5899-9e99-c6cba0d46f79": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "86328874-0655-5fec-9a16-23ebc5079d6a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b93fa3d3-e9d9-5bd1-84cc-8aa5387ced1e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "6e9c0e65-4eca-5510-9b6f-d34416264867": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0e25f0a7-949b-58fe-8af8-f4069706cff8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1152435e-e7a9-51ad-918f-22826e326906": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "33314f50-2602-515b-98b5-351cdcbf83f8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "e9168d6d-8522-513b-bfaf-068a9a5d4080": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b41ad2d2-149b-5a5d-9fe7-039883147800": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "407d21b5-dd15-574e-9849-5947e355efc8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "eac0c8f1-4686-5f43-92e9-da6d1e36ecbb": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "fac1583e-dede-559a-aeab-a6e3796f4fee": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b72d8345-dc32-5fcb-82a6-e68466c8bc4e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "cd6c0d77-fa7f-53c5-b762-cb5a4e62f0ab": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "109283fd-0be1-54ce-adb7-7b7b5af050bf": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0e837be0-7a5d-5d85-b1c8-4a3b6751d3f8": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1f62ed15-1040-54ed-8f59-ddf391be5206": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "0e805acb-48ab-5a76-8c6b-34df871d9fcc": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "34d66ae6-cc1f-5648-a409-61f214673426": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "654e384e-7022-5735-9e48-8dea2566150c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "51b8ea8b-a4b3-5264-a36f-e39210d282bb": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "53f55193-1666-50a4-af42-fa04795a2e5f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d6cc42fd-a1f2-5a2a-bf20-905f75063650": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "e7851a2d-5c6a-539f-8eb8-0fae3979343a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c8c1b9ad-fcda-5ffb-9ae1-1679148848fb": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "3a68ffdb-51b6-5293-a66d-6b507211a7f4": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "f1861fc0-e015-5bc3-beed-3a1fd67318e3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b35e8a2c-3967-5bed-9eb2-b49ce341827f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "fcc97ea3-c78e-5f58-b776-1cf0475de440": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "f3bed2cf-36fa-5569-a242-6116aae43cd2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "2bfa952f-24b7-5c24-922a-3b58a4b2293a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "5f2ac4cb-b000-5a2f-8f17-cf6dcb3e0ec3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b77eee58-51ba-50da-8b6c-091a4cfaace0": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "3096445a-de24-53d7-b6fe-02afd4866426": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c4fdcd87-cfaa-5dc4-9e5a-6678b7067003": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "c4b1a561-67f9-513d-b5d9-4f79b787bd81": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "47746056-b31e-5c7c-a5b6-19daa4c18fe9": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "352e9ce1-996b-536a-a724-ec103a902960": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "1374c25a-853b-5bcb-9ff6-40b0bd74f73a": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "4768f377-ff44-5798-84f8-3f8218314235": {
+      "variants": {
+        "foil": 1,
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "9e8a7d16-3bcc-5087-8272-6d277551ec66": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "71fcab77-34de-567e-84ae-c6cdaed921d3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "324d06fe-f396-5df6-8c4b-959bdf360e94": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "be740612-6e93-58ec-b40d-75f21ca5c4e9": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "dd5cb3d5-b7e6-5fc6-87f3-0231cb6a619d": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "b101450b-c732-51ab-a269-7e909a9ca378": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "17e8679b-5a2e-5b8c-9cbb-cd3f2be3c7a4": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "a86fb38f-7458-5f08-9fd5-417f9a258882": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "883c21df-586b-5692-a0b1-afde73e463d5": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "f3656751-34a8-5eb6-9d56-969fae8f8260": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "690cf364-002e-5908-81bd-e843e257c075": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "28b1097c-21e3-5ba9-9cc1-db33a8cb344e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "4794891d-bad9-5714-9b14-c6569558202f": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "98ca8bb7-ad04-518e-88e2-2abfe50044d7": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "33a0f7ce-bc14-5c35-a0f3-91db4bd46fec": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "5fd4aac1-e55a-5a9a-8111-8028a33a0773": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "7d727973-9da1-5c0e-bd05-8bf7d7e42550": {
+      "variants": {
+        "foil": 1,
+        "normal": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "939acb07-e18e-5b2b-acf7-68e84e025ee5": {
+      "variants": {
+        "normal": 1,
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "d907a136-6287-510b-99d4-c73b201a778a": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-08"
+    },
+    "830ffd07-9951-589d-8eff-f51896ae57b6": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "7c58e890-16c7-5442-b3ff-b7550bb1d4cb": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "dfc5c6ca-774a-507f-96f4-c5b10588cd37": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "9a34d7f8-daa5-5ad3-99fc-47968c9adfc9": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "b03fc369-3f85-508e-aac9-138058a15081": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "58a4a21d-59a4-543e-94d9-fbcf0f22e33b": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "a48b6860-908a-5d3a-ba1e-ea29d557ae9a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "e39f0341-ffd0-5669-8160-0708ed373000": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "7995f2da-142d-54e7-b6e0-6c50a69e8d2c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "9ed44757-41d0-572b-b37c-dfb8c7d7cab4": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "cca7dae3-942a-55b8-bc8e-b76140da05cc": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "2d270a6a-4682-5d24-a207-3b9c7eeee2a1": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "4348fdba-a4e5-5641-9054-1c0283e4b033": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "c3c52df9-10a4-58da-b04e-f7102837ad4d": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "7407817c-ec55-568b-974e-a23768ebcedd": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "03d27a50-be16-5320-a46c-b7e6b0d9b6f4": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "ed290316-08ff-57f8-aee2-c22dc69d88d3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "d598507d-d5e2-51b6-ba9d-2897753ed360": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "93385a7e-295f-500d-a694-e7d252c763e9": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "d00f968b-3b85-5108-81d2-be46429e2741": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "61f76865-e0a9-5c74-8cfd-88949d2ecee8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "34b0b75a-5880-534b-b22e-fd42cd19aa85": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "e6890f6a-43b3-51e8-add7-922ac91cf3d7": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "07b1502d-cf1c-514b-933b-af675755fffa": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "9b48c5ae-523d-52df-ab9d-cef881545696": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "fdf84995-c87c-5146-b183-c557eafeb703": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "54fba9b0-4499-5880-8a80-f350f2af3b90": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "63dc7c9e-b3f2-5955-98ea-0e16943f21cb": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "1857203e-9712-5201-8cfd-9545ac38e441": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "33387137-4748-5127-ae15-4f399e149c9a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "529f32d6-f59d-5937-b07a-01aa224cd051": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "54c224ea-2a99-57cf-afda-7f5434e9c655": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "ac34447a-0ab2-5180-a9ff-f8ebbc3e0c3a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "87b7494b-5101-53ec-8de3-931f15f44c53": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "d0b6721e-80f3-5ed0-a907-7e7820419000": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "cb245250-343d-5f0e-82a0-12f00c9223a8": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "76ae26df-a518-5675-a4dd-d38ab613951e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "a14352d4-29fa-5b23-97da-36d9039ad90e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "fff587be-3a25-510a-a032-1a8caf26ac06": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "71a5e1d5-7e84-5c57-9ead-f95d4f39206a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "907c6394-2c73-5007-a1bc-8274da531024": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "0b1cdfe1-957e-5088-8d28-3fd67bb1789c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "97b32429-0460-5bb9-bac9-7e853c6a3586": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "0b2c5f77-c861-564c-ba46-cc8a940d7c5f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "662afd84-d9ce-5755-b333-cfbfc8f89746": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "f15ce538-0c9d-5935-8b8b-5d73644383ba": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "13da0008-fddb-5a92-b846-fff422315688": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "93fda5cc-335a-5b97-aa36-e7a66e472fbd": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "bdad91dd-0ec4-596e-8c94-e995ad5ec02b": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "42b79d14-7f05-51c3-9611-b4ba03f9ec31": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "cd941c75-4f59-5576-a20e-3b079abb6f3e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "f4347348-8e3b-51b5-9af7-dac230f148a4": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "71d77626-8fc2-5506-88c8-3c6f02545a38": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "1dc1af69-f3d6-55fe-a9f1-76cca24255d6": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "73c23592-8a4c-5fda-8aca-df45b25d1303": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "cf6187bb-5540-5bc1-83cc-db4ce75d9f3e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "53bd84d4-317d-51de-9bf1-68494df930ea": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "5d84afe3-f907-5fac-b0f6-b267ce5a7888": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "8bd31f5d-2ed4-5b08-831c-9b6e9c8cdd1e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "4667bab2-53e7-51b6-8a1f-1e3fab676ef1": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "cb0fe014-9bc5-5e3c-9e00-916cb771c292": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "28f5884c-896f-57ca-9424-e22c9e10dfac": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "9f52540b-5409-5b85-ab45-968292ddc138": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "2b08a295-f9b1-592f-9746-0f0157a2593a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "642c0305-928a-57c7-a01a-0207c056bca1": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "74a0a483-ebb8-5f9b-b588-0261f488fb8f": {
+      "variants": {
+        "normal": 1,
+        "surgefoil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "292c6457-9c0e-5291-906c-2a4b3e23fe2e": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "d37d6ccc-5e04-5204-8f60-a73ce9abee1a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "14cb7361-1853-5eae-a8e1-ac550e9244ba": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "bcd0aac5-cc09-5b52-8550-91dc83282d5d": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "7dc203c8-b6ec-5cfa-8310-fb0df955f6bc": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "a7897ef9-e4d0-5b7f-9664-b329a687e327": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "c1fe5999-aa2d-5b30-818e-7e2dadeda7af": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "430e1ac8-50de-50fd-9214-bb8cb3efa816": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "5fe4790a-696f-54e4-a0c8-7ccfbcfc2be7": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "4ca6cd4c-4d07-57a7-a496-d4e20313ed7d": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "3b4d45b9-d627-5d5c-80d2-be0e97532606": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "a1776dfd-85d9-5e73-abab-d4a17a0ec97f": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "eb757bde-b4ae-51a9-8829-5efa443840cc": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "816da53f-f6d1-500e-8346-75aca60f9aa2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "3a1324bd-b2d7-5383-8eca-eeff1ec498ae": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "45a40ed1-1d86-52b6-8626-d4286416c8a3": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "940c7a4c-bd52-52e8-ab32-f5119a9b8133": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "d74242bc-0796-5613-95b3-ffbbdc936f31": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "2b5d4a4c-e1fb-5cb3-a08a-6100874e0d7a": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "4f7a8d19-0dff-5cef-9ebe-4c411a0ed9b0": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "56c70c94-d26a-5ffd-9384-a375ef839f67": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "4f63053f-e511-575b-93d5-b67a06d34cfb": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-09"
+    },
+    "7f305ec6-d9bf-58cb-ae14-98fe93fb3cc2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "49c27067-a98e-5b4f-9df5-b64e10b1a694": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "70df5330-3b49-508a-acbf-18582045728e": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "30a97e70-63c7-54c2-ac75-ae63ba23d85d": {
+      "variants": {
+        "foil": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "08a962c4-12b1-5edb-b8d4-08ca3fdbafb2": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "f1fe37ca-4e6c-5001-99f4-22c247bd0157": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "c8dd509f-247b-5ea4-9bf4-b029b76d257a": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "34513863-e956-5ef3-b303-0d6c859e6c5c": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    },
+    "7969a940-d65f-5c19-aae4-f83c3a0b4b90": {
+      "variants": {
+        "normal": 1
+      },
+      "acquired": "2026-08-16"
+    }
+  },
+  "preferences": {
+    "imageMode": "normal"
+  }
+}

@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MTGJSON Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#12141a;
+  --panel:#191c24;
+  --panel-alt:#20242e;
+  --panel-raised:#262b37;
+  --border:#2b303c;
+  --border-soft:#22262f;
+  --text:#ecedf0;
+  --text-dim:#8a93a6;
+  --text-faint:#5c6470;
+  --gold:#cda349;
+  --gold-bright:#e8c878;
+  --danger:#e0562d;
+  --w:#f0e6c8; --u:#4fa3e8; --b:#b9b4c4; --r:#e0562d; --g:#5fb562;
+  --common:#ecedf0; --uncommon:#b9c9d4; --rare:#d4a84b; --mythic:#ff6a3d; --special:#c88fe0; --bonus:#c88fe0;
+  --radius:8px;
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--gold-bright);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:var(--font-body); font-size:15px; line-height:1.45;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+::selection{ background:var(--gold); color:#12141a; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:#333947; border-radius:6px; border:2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover{ background:#414957; }
+a{ color:var(--gold-bright); }
+button{ font-family:inherit; }
+:focus-visible{ outline:none; box-shadow:var(--focus); border-radius:4px; }
+
+/* ---------- HEADER ---------- */
+header{
+  display:flex; align-items:center; gap:16px;
+  padding:10px 18px; background:linear-gradient(180deg,#161922,#13151b);
+  border-bottom:1px solid var(--border); flex:0 0 auto; z-index:20;
+}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand .mark{
+  font-family:var(--font-display); font-weight:700; font-size:19px; letter-spacing:.2px;
+  background:linear-gradient(100deg, var(--gold-bright) 0%, var(--gold) 35%, #fff6de 50%, var(--gold) 65%, var(--gold-bright) 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:sheen 7s linear infinite;
+}
+@keyframes sheen{ 0%{background-position:0% 0;} 100%{background-position:220% 0;} }
+.brand .sub{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1.4px; }
+.file-status{
+  flex:1; display:flex; align-items:center; gap:10px; min-width:0;
+  font-family:var(--font-mono); font-size:12px; color:var(--text-dim);
+}
+.file-status .name{ color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dot{ width:7px; height:7px; border-radius:50%; background:var(--text-faint); flex:0 0 auto; }
+.dot.ok{ background:var(--g); box-shadow:0 0 6px var(--g); }
+.dot.err{ background:var(--danger); box-shadow:0 0 6px var(--danger); }
+.hbtns{ display:flex; gap:8px; }
+.btn{
+  background:var(--panel-raised); color:var(--text); border:1px solid var(--border);
+  padding:7px 12px; border-radius:6px; cursor:pointer; font-size:12.5px; font-weight:500;
+  transition:border-color .15s, transform .1s, background .15s; white-space:nowrap;
+}
+.btn:hover{ border-color:var(--gold); background:#2c313e; }
+.btn:active{ transform:translateY(1px); }
+.btn.primary{ background:linear-gradient(180deg,var(--gold-bright),var(--gold)); color:#1a1408; border-color:var(--gold); font-weight:600; }
+.btn.primary:hover{ filter:brightness(1.07); }
+.btn.ghost{ background:transparent; }
+.btn.small{ padding:4px 9px; font-size:11.5px; }
+.btn[disabled]{ opacity:.4; cursor:not-allowed; }
+input[type=file]{ display:none; }
+
+/* ---------- LAYOUT ---------- */
+.shell{ flex:1; display:grid; grid-template-columns:270px minmax(480px,1fr) 340px; min-height:0; overflow-x:auto; }
+
+/* Drop overlay */
+#dropOverlay{
+  position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(18,20,26,.86); backdrop-filter: blur(2px);
+}
+#dropOverlay.show{ display:flex; }
+#dropOverlay .box{
+  border:2px dashed var(--gold); border-radius:14px; padding:56px 70px; text-align:center;
+  font-family:var(--font-display); font-size:22px; color:var(--gold-bright);
+}
+#dropOverlay .box small{ display:block; margin-top:8px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim); }
+
+/* Landing (before any file loaded) */
+#landing{
+  grid-column:1/-1; display:flex; align-items:center; justify-content:center; padding:40px;
+}
+#landing .card{
+  max-width:560px; width:100%; text-align:center; padding:46px 40px;
+  border:1px solid var(--border); border-radius:14px; background:var(--panel);
+  position:relative; overflow:hidden;
+}
+#landing .card::before{
+  content:''; position:absolute; inset:0; opacity:.06; pointer-events:none;
+  background:repeating-linear-gradient(135deg, var(--gold) 0 1px, transparent 1px 22px);
+}
+#landing h1{ font-family:var(--font-display); font-size:28px; margin:0 0 6px; font-weight:600; }
+#landing p{ color:var(--text-dim); margin:0 0 26px; font-size:13.5px; }
+#landing .drop{
+  border:1.5px dashed var(--border); border-radius:10px; padding:34px 20px; cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+#landing .drop:hover, #landing .drop.hover{ border-color:var(--gold); background:var(--panel-alt); }
+#landing .drop .ico{ font-size:26px; margin-bottom:8px; }
+#landing .drop .lead{ font-weight:600; }
+#landing .drop .small{ font-size:11.5px; color:var(--text-faint); margin-top:4px; font-family:var(--font-mono); }
+#landing .formats{ margin-top:22px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.chip{
+  font-family:var(--font-mono); font-size:10.5px; color:var(--text-dim);
+  border:1px solid var(--border-soft); padding:3px 8px; border-radius:20px;
+}
+
+/* ---------- SIDEBAR ---------- */
+#sidebar{ background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; min-height:0; }
+.sb-tabs{ display:flex; border-bottom:1px solid var(--border); flex:0 0 auto; }
+.sb-tab{
+  flex:1; padding:10px 8px; text-align:center; font-size:11.5px; letter-spacing:.4px; text-transform:uppercase;
+  color:var(--text-faint); cursor:pointer; border-bottom:2px solid transparent; font-weight:600;
+}
+.sb-tab:hover{ color:var(--text-dim); }
+.sb-tab.active{ color:var(--gold-bright); border-bottom-color:var(--gold); }
+.sb-pane{ display:none; flex:1; min-height:0; overflow-y:auto; }
+.sb-pane.active{ display:flex; flex-direction:column; }
+
+.set-header{ padding:14px 14px 10px; border-bottom:1px solid var(--border-soft); }
+.set-header .name{ font-family:var(--font-display); font-weight:600; font-size:16px; }
+.set-header .meta{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-top:3px; }
+
+.nav-group{ padding:8px; }
+.nav-label{ font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:8px 8px 4px; }
+.nav-item{
+  display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px; cursor:pointer;
+  color:var(--text-dim); font-size:13.5px; margin-bottom:1px;
+}
+.nav-item:hover{ background:var(--panel-alt); color:var(--text); }
+.nav-item.active{ background:var(--panel-raised); color:var(--gold-bright); }
+.nav-item .ic{ width:15px; text-align:center; opacity:.85; flex:0 0 auto; }
+.nav-item .lbl{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.nav-item .cnt{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); }
+.nav-item.active .cnt{ color:var(--gold); }
+.nav-empty{ padding:14px; color:var(--text-faint); font-size:12px; }
+
+/* JSON tree pane */
+#treePane{ padding:10px; font-family:var(--font-mono); font-size:12px; }
+.tree-toolbar{ display:flex; gap:6px; padding:2px 2px 10px; }
+.jt{ }
+.jt-row{ display:flex; align-items:flex-start; gap:4px; padding:1.5px 0; cursor:default; border-radius:4px; }
+.jt-row.clickable{ cursor:pointer; }
+.jt-row.clickable:hover{ background:var(--panel-alt); }
+.jt-toggle{ width:13px; flex:0 0 auto; color:var(--text-faint); user-select:none; cursor:pointer; text-align:center; }
+.jt-key{ color:#8fb8e0; }
+.jt-punc{ color:var(--text-faint); }
+.jt-type{ color:var(--text-faint); font-style:italic; }
+.jt-str{ color:#c9d97a; }
+.jt-num{ color:#e8b96a; }
+.jt-bool{ color:#e0a3e0; }
+.jt-null{ color:var(--text-faint); }
+.jt-children{ margin-left:15px; border-left:1px dotted var(--border); padding-left:3px; }
+.jt-load{
+  margin-left:4px; font-family:var(--font-body); font-size:10.5px; color:#1a1408;
+  background:var(--gold); border-radius:10px; padding:1px 8px; cursor:pointer; font-weight:600;
+}
+.jt-load:hover{ background:var(--gold-bright); }
+.jt-more{ color:var(--text-faint); font-size:11px; padding:3px 0 3px 17px; cursor:pointer; }
+.jt-more:hover{ color:var(--gold-bright); }
+
+/* ---------- MAIN / TABLE ---------- */
+#main{ display:flex; flex-direction:column; min-height:0; background:var(--bg); border-right:1px solid var(--border); }
+.toolbar{
+  display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border);
+  background:var(--panel); flex:0 0 auto; flex-wrap:wrap;
+}
+.searchbox{ position:relative; flex:1; min-width:180px; }
+.searchbox input{
+  width:100%; background:var(--panel-alt); border:1px solid var(--border); color:var(--text);
+  padding:8px 12px 8px 30px; border-radius:7px; font-size:13px;
+}
+.searchbox input::placeholder{ color:var(--text-faint); }
+.searchbox .ic{ position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-size:12px; }
+select.filter{
+  background:var(--panel-alt); border:1px solid var(--border); color:var(--text-dim);
+  padding:7px 10px; border-radius:7px; font-size:12.5px;
+}
+.count-pill{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); white-space:nowrap; padding-left:2px; }
+
+.table-wrap{ flex:1; overflow:auto; min-height:0; }
+table{ width:100%; min-width:980px; border-collapse:collapse; font-size:13.3px; }
+thead{ position:sticky; top:0; z-index:5; }
+th{
+  background:var(--panel); color:var(--text-dim); text-align:left; padding:9px 12px;
+  border-bottom:1px solid var(--border); font-weight:600; font-size:11px; text-transform:uppercase;
+  letter-spacing:.5px; cursor:pointer; user-select:none; white-space:nowrap;
+}
+th:hover{ color:var(--text); }
+th .arrow{ margin-left:4px; color:var(--gold); }
+td{ padding:8px 12px; border-bottom:1px solid var(--border-soft); vertical-align:middle; color:var(--text); white-space:nowrap; }
+tbody tr{ cursor:pointer; transition:background .1s; }
+tbody tr:hover{ background:var(--panel-alt); }
+tbody tr.selected{ background:#2a2411; box-shadow:inset 2px 0 0 var(--gold); }
+.mono{ font-family:var(--font-mono); color:var(--text-dim); font-size:12.5px; }
+.pill{
+  display:inline-block; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:600;
+  text-transform:capitalize; border:1px solid transparent;
+}
+.pill.common{ color:var(--common); border-color:#3a3f4a; }
+.pill.uncommon{ color:var(--uncommon); border-color:#3a4a52; }
+.pill.rare{ color:var(--rare); border-color:#5a4a2a; }
+.pill.mythic{ color:var(--mythic); border-color:#5a3120; }
+.pill.special, .pill.bonus{ color:var(--special); border-color:#4a3a52; }
+.mana-pips{ display:inline-flex; gap:2px; }
+.pip{ width:15px; height:15px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#12141a; }
+.pip.W{ background:var(--w); } .pip.U{ background:var(--u); color:#fff; } .pip.B{ background:var(--b); }
+.pip.R{ background:var(--r); color:#fff; } .pip.G{ background:var(--g); }
+.check{ color:var(--g); }
+.dim{ color:var(--text-faint); }
+.empty-state{ padding:60px 20px; text-align:center; color:var(--text-faint); }
+.empty-state .big{ font-family:var(--font-display); font-size:18px; color:var(--text-dim); margin-bottom:6px; }
+
+/* generic object table for non-card arrays */
+.kv-table td.key{ color:var(--text-dim); width:220px; font-family:var(--font-mono); font-size:11.5px; }
+
+/* ---------- INSPECTOR ---------- */
+#inspector{ background:var(--panel); display:flex; flex-direction:column; min-height:0; }
+.insp-empty{ flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-faint); padding:30px; text-align:center; font-size:12.5px; }
+.insp-scroll{ flex:1; overflow-y:auto; min-height:0; }
+.insp-hero{ padding:16px 16px 0; }
+.card-frame{
+  position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border);
+  background:var(--panel-alt); aspect-ratio:5/7; display:flex; align-items:center; justify-content:center;
+}
+.card-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+.card-frame.foil::after{
+  content:''; position:absolute; inset:0; pointer-events:none; mix-blend-mode:overlay; opacity:.55;
+  background:conic-gradient(from 0deg, #ff9ecf, #ffe29e, #9effe0, #9ecfff, #d29eff, #ff9ecf);
+  animation:foilspin 6s linear infinite;
+}
+@keyframes foilspin{ to{ transform:rotate(360deg); } }
+.card-frame .noimg{ color:var(--text-faint); font-size:12px; font-family:var(--font-mono); }
+.insp-title{ padding:14px 16px 0; }
+.insp-title h2{ font-family:var(--font-display); font-size:19px; margin:0 0 3px; font-weight:600; }
+.insp-title .type{ color:var(--text-dim); font-size:12.5px; }
+.insp-badges{ display:flex; gap:6px; padding:10px 16px 0; flex-wrap:wrap; align-items:center; }
+.insp-oracle{ padding:12px 16px; font-size:13px; color:var(--text); line-height:1.55; white-space:pre-wrap; }
+.insp-flavor{ padding:0 16px 10px; font-style:italic; color:var(--text-dim); font-size:12px; white-space:pre-wrap; }
+.insp-actions{ display:flex; gap:6px; padding:4px 16px 14px; flex-wrap:wrap; }
+
+.tabs-nav{ display:flex; gap:2px; padding:0 12px; border-bottom:1px solid var(--border); overflow-x:auto; flex:0 0 auto; }
+.tab-btn{
+  padding:9px 10px; font-size:11.5px; color:var(--text-faint); cursor:pointer; white-space:nowrap;
+  border-bottom:2px solid transparent; font-weight:600;
+}
+.tab-btn:hover{ color:var(--text-dim); }
+.tab-btn.active{ color:var(--gold-bright); border-bottom-color:var(--gold); }
+.tab-panel{ display:none; padding:14px 16px; font-size:12.5px; }
+.tab-panel.active{ display:block; }
+.field-row{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid var(--border-soft); }
+.field-row .k{ color:var(--text-faint); font-family:var(--font-mono); font-size:11px; }
+.field-row .v{ text-align:right; color:var(--text); font-family:var(--font-mono); font-size:11.5px; word-break:break-all; }
+.field-row .v a{ text-decoration:none; }
+.fdata-block{ padding:10px 0; border-bottom:1px solid var(--border-soft); }
+.fdata-block .lang{ color:var(--gold-bright); font-weight:600; font-size:11.5px; margin-bottom:3px; }
+.fdata-block .fname{ font-size:13px; }
+pre.rawjson{
+  background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px;
+  font-family:var(--font-mono); font-size:11px; overflow:auto; max-height:60vh; color:var(--text-dim);
+}
+
+/* ---------- COLLECTION ---------- */
+.coll-cell{ display:flex; align-items:center; gap:7px; }
+.coll-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; border:1px solid var(--border-soft); }
+.coll-dot.none{ background:transparent; }
+.coll-dot.partial{ background:var(--gold); box-shadow:0 0 5px var(--gold); border-color:var(--gold); }
+.coll-dot.complete{ background:var(--g); box-shadow:0 0 5px var(--g); border-color:var(--g); }
+.coll-editbtn{
+  background:var(--panel-raised); color:var(--text-dim); border:1px solid var(--border);
+  padding:2px 8px; border-radius:5px; cursor:pointer; font-size:10.5px; font-weight:600;
+}
+.coll-editbtn:hover{ border-color:var(--gold); color:var(--text); }
+.coll-qty{ font-family:var(--font-mono); font-size:12px; color:var(--text); }
+.coll-qty.zero{ color:var(--text-faint); }
+
+#colBtnWrap{ position:relative; }
+#columnsMenu{
+  position:absolute; top:calc(100% + 6px); right:0; z-index:40; display:none;
+  background:var(--panel-raised); border:1px solid var(--border); border-radius:8px;
+  padding:8px; min-width:210px; box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+#columnsMenu.show{ display:block; }
+#columnsMenu label{
+  display:flex; align-items:center; gap:8px; padding:5px 6px; font-size:12px; color:var(--text-dim);
+  cursor:pointer; border-radius:5px;
+}
+#columnsMenu label:hover{ background:var(--panel-alt); color:var(--text); }
+#columnsMenu label input{ accent-color:var(--gold); }
+#columnsMenu .cm-title{ font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:4px 6px 6px; }
+
+/* Popover editor */
+#collPopoverOverlay{
+  position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center;
+  background:rgba(15,17,22,.7);
+}
+#collPopoverOverlay.show{ display:flex; }
+#collPopover{
+  width:320px; max-width:92vw; background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.55); overflow:hidden;
+}
+#collPopover .cp-head{
+  padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+#collPopover .cp-head-main{ display:flex; align-items:center; gap:12px; min-width:0; }
+#collPopover .cp-thumb{
+  width:76px; height:106px; border-radius:8px; overflow:hidden; flex:0 0 auto; background:var(--panel-alt);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:zoom-in;
+}
+#collPopover .cp-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+#collPopover .cp-thumb .noimg{ font-size:8px; color:var(--text-faint); text-align:center; }
+#collPopover .cp-head h3{ margin:0; font-family:var(--font-display); font-size:15.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#collPopover .cp-head .cp-sub{ font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:2px; }
+#collPopover .cp-close{ background:none; border:none; color:var(--text-faint); font-size:18px; cursor:pointer; line-height:1; padding:2px; }
+#collPopover .cp-close:hover{ color:var(--text); }
+#collPopover .cp-body{ padding:12px 16px; }
+.cp-variant-group{ padding:6px 0 10px; border-bottom:1px solid var(--border-soft); }
+.cp-variant-group:last-of-type{ border-bottom:none; }
+.cp-variant-title{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gold-bright); padding:6px 0 2px; }
+.cp-variant-row{ display:flex; align-items:center; justify-content:space-between; padding:6px 0; }
+.cp-variant-row .cp-label{ font-size:12.5px; color:var(--text-dim); }
+.cp-stepper{ display:flex; align-items:center; gap:8px; }
+.cp-stepper button{
+  width:24px; height:24px; border-radius:6px; border:1px solid var(--border); background:var(--panel-raised);
+  color:var(--text); cursor:pointer; font-size:14px; line-height:1; font-weight:600;
+}
+.cp-stepper button:hover{ border-color:var(--gold); }
+.cp-stepper input{
+  width:40px; text-align:center; background:var(--panel-alt); border:1px solid var(--border); color:var(--text);
+  border-radius:5px; padding:3px 0; font-family:var(--font-mono); font-size:12.5px;
+}
+.cp-field{ margin-top:8px; }
+.cp-field label{ display:block; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.cp-field input[type=date]{
+  width:100%; background:var(--panel-alt); border:1px solid var(--border); color:var(--text);
+  padding:7px 10px; border-radius:6px; font-size:12.5px; font-family:var(--font-mono);
+}
+#collPopover .cp-foot{ padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+/* Image mode toggle */
+.imgmode-toggle{ display:flex; gap:6px; padding:8px 16px 0; }
+.imgmode-toggle button{
+  flex:1; background:var(--panel-raised); color:var(--text-dim); border:1px solid var(--border);
+  padding:6px 8px; border-radius:6px; cursor:pointer; font-size:11.5px; font-weight:600;
+}
+.imgmode-toggle button.active{ background:var(--gold); color:#1a1408; border-color:var(--gold); }
+.imgmode-toggle button:disabled{ opacity:.35; cursor:not-allowed; }
+
+.insp-mycoll{ padding:12px 16px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.insp-mycoll h4{ margin:0 0 8px; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); }
+.insp-mycoll .row{ display:flex; justify-content:space-between; padding:3px 0; font-size:12.5px; }
+.insp-mycoll .row .k{ color:var(--text-dim); }
+.insp-mycoll .row .v{ font-family:var(--font-mono); }
+.insp-mycoll .acq{ margin-top:6px; font-size:11px; color:var(--text-faint); font-family:var(--font-mono); }
+
+.searchscope{ background:var(--panel-alt); border:1px solid var(--border); color:var(--text-dim); padding:7px 8px; border-radius:7px; font-size:12px; }
+
+/* ---------- PANEL TOGGLES ---------- */
+.panel-toggle-btn.active{ border-color:var(--gold); color:var(--gold-bright); }
+
+/* ---------- IMAGE LIGHTBOX (click card to enlarge) ---------- */
+.card-frame{ cursor:zoom-in; }
+.card-frame:hover::before{
+  content:'🔍 Ampliar'; position:absolute; left:50%; bottom:8px; transform:translateX(-50%);
+  background:rgba(12,13,17,.75); color:var(--text); font-size:10.5px; font-family:var(--font-body);
+  padding:3px 9px; border-radius:20px; z-index:2; pointer-events:none;
+}
+#imgLightboxOverlay{
+  position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center;
+  background:rgba(10,11,15,.92); cursor:zoom-out; padding:40px;
+}
+#imgLightboxOverlay.show{ display:flex; }
+#imgLightboxFrame{ position:relative; max-width:min(80vh,600px); width:100%; }
+#imgLightboxFrame img{
+  width:100%; display:block; border-radius:16px; box-shadow:0 30px 90px rgba(0,0,0,.65);
+  border:1px solid var(--border);
+}
+#imgLightboxFrame.foil::after{
+  content:''; position:absolute; inset:0; border-radius:16px; pointer-events:none; mix-blend-mode:overlay; opacity:.55;
+  background:conic-gradient(from 0deg, #ff9ecf, #ffe29e, #9effe0, #9ecfff, #d29eff, #ff9ecf);
+  animation:foilspin 6s linear infinite;
+}
+#lightboxClose{
+  position:absolute; top:-40px; right:0; background:none; border:none; color:var(--text-dim);
+  font-size:26px; cursor:pointer; line-height:1;
+}
+#lightboxClose:hover{ color:var(--text); }
+
+/* ---------- RESPONSIVE / MOBILE ---------- */
+.mobile-panel-close{
+  display:none; position:absolute; top:8px; right:8px; z-index:5;
+  width:30px; height:30px; border-radius:50%; border:1px solid var(--border);
+  background:var(--panel-raised); color:var(--text-dim); font-size:14px; cursor:pointer;
+}
+#panelBackdrop{
+  position:fixed; inset:0; z-index:60; display:none;
+  background:rgba(10,11,15,.6); backdrop-filter:blur(1px);
+}
+#panelBackdrop.show{ display:block; }
+
+.fab{
+  display:none; position:fixed; right:16px; bottom:16px; z-index:55;
+  width:52px; height:52px; border-radius:50%; border:1px solid var(--gold);
+  background:linear-gradient(180deg,var(--gold-bright),var(--gold)); color:#1a1408;
+  font-size:20px; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.45);
+}
+.fab.show{ display:block; }
+
+@media (max-width:900px){
+  header{ flex-wrap:wrap; padding:8px 10px; gap:6px 10px; }
+  .brand .sub{ display:none; }
+  .file-status{ order:3; flex-basis:100%; min-width:0; font-size:11px; }
+  .hbtns{
+    order:2; flex:1 1 auto; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding-bottom:2px; scrollbar-width:none;
+  }
+  .hbtns::-webkit-scrollbar{ display:none; }
+  .btn.small{ flex:0 0 auto; }
+
+  .shell{ display:block; overflow:visible; position:relative; }
+  #landing{ display:flex; padding:24px 16px; }
+  #main{ width:100%; border-right:none; }
+
+  #sidebar, #inspector{
+    position:fixed; top:0; bottom:0; z-index:70; width:88vw; max-width:340px;
+    box-shadow:0 0 44px rgba(0,0,0,.55); transition:transform .25s ease;
+  }
+  #sidebar{ left:0; transform:translateX(-104%); }
+  #sidebar.mobile-open{ transform:translateX(0); }
+  #inspector{ right:0; transform:translateX(104%); border-left:1px solid var(--border); }
+  #inspector.mobile-open{ transform:translateX(0); }
+  .mobile-panel-close{ display:block; }
+
+  .fab{ display:block; }
+
+  table{ min-width:720px; }
+  .toolbar{ padding:8px 10px; }
+}
+
+@media (max-width:560px){
+  .searchbox{ min-width:130px; flex:1 1 130px; }
+  .searchscope{ display:none; }
+  select.filter{ font-size:11px; padding:6px 8px; }
+  .count-pill{ flex-basis:100%; text-align:right; }
+  .btn.small{ padding:6px 9px; font-size:11px; }
+  #sidebar, #inspector{ width:92vw; max-width:none; }
+  .insp-title h2{ font-size:17px; }
+  .card-frame{ margin:0 auto; max-width:260px; }
+  table{ min-width:640px; font-size:12.5px; }
+  th, td{ padding:7px 8px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="mark">MTGJSON Explorer</span><span class="sub">v1.0</span></div>
+  <div class="file-status" id="fileStatus"><span class="dot" id="statusDot"></span><span class="name" id="statusName">Ningún archivo cargado</span></div>
+  <div class="hbtns">
+    <button class="btn small" id="btnOpen">Abrir JSON…</button>
+    <button class="btn small ghost" id="btnOpenFolder" title="Detectar automáticamente los JSON de la misma carpeta">Abrir carpeta</button>
+    <button class="btn small ghost" id="btnExportCollection" title="Descargar coleccion.json">Guardar colección</button>
+    <button class="btn small ghost" id="btnImportCollection" title="Cargar un coleccion.json exportado previamente">Importar colección</button>
+    <button class="btn small ghost" id="btnClearStorage" title="Borrar preferencias guardadas en este navegador">Limpiar almacenamiento</button>
+    <button class="btn small ghost panel-toggle-btn" id="btnToggleSidebar" title="Mostrar/ocultar panel izquierdo">◧ Panel izq.</button>
+    <button class="btn small ghost panel-toggle-btn" id="btnToggleInspector" title="Mostrar/ocultar panel derecho">▤ Panel der.</button>
+  </div>
+  <input type="file" id="fileInput" accept=".json,application/json">
+  <input type="file" id="collectionFileInput" accept=".json,application/json">
+</header>
+
+<div id="dropOverlay"><div class="box">Suelta el archivo para cargarlo<small>.json de MTGJSON — cualquier formato (Set, AllPrintings, AllIdentifiers…)</small></div></div>
+
+<div class="shell" id="shell">
+
+  <div id="landing">
+    <div class="card">
+      <h1>Explora cualquier archivo MTGJSON</h1>
+      <p>Arrastra un archivo <code>.json</code> — la app detecta automáticamente su estructura (Set único, AllPrintings, AllIdentifiers, etc.) sin asumir rutas fijas.</p>
+      <div class="drop" id="landingDrop">
+        <div class="ico">🗂️</div>
+        <div class="lead">Arrastra tu archivo aquí</div>
+        <div class="small">o haz clic para seleccionarlo</div>
+      </div>
+      <div class="formats">
+        <span class="chip">Set (TMT.json)</span>
+        <span class="chip">AllPrintings.json</span>
+        <span class="chip">AllIdentifiers.json</span>
+        <span class="chip">AtomicCards.json</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="sidebar" style="display:none">
+    <button class="mobile-panel-close" id="btnCloseSidebarMobile" aria-label="Cerrar">✕</button>
+    <div class="sb-tabs">
+      <div class="sb-tab active" data-pane="navPane">Detectado</div>
+      <div class="sb-tab" data-pane="treePaneWrap">Árbol JSON</div>
+    </div>
+    <div class="sb-pane active" id="navPane">
+      <div class="set-header" id="setHeader"></div>
+      <div class="nav-group" id="navGroup"></div>
+    </div>
+    <div class="sb-pane" id="treePaneWrap">
+      <div class="tree-toolbar">
+        <button class="btn small ghost" id="treeExpandAll">Expandir</button>
+        <button class="btn small ghost" id="treeCollapseAll">Colapsar</button>
+      </div>
+      <div id="treePane"></div>
+    </div>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="toolbar">
+      <div class="searchbox"><span class="ic">🔍</span><input type="text" id="searchBox" placeholder="Buscar por nombre, número (#), tipo, artista, texto, uuid…"></div>
+      <select class="searchscope" id="searchScope" title="Ámbito de la búsqueda">
+        <option value="all">Buscar en: Todo</option>
+        <option value="name">Buscar en: Cartas (nombre)</option>
+        <option value="artist">Buscar en: Artistas</option>
+      </select>
+      <select class="filter" id="filterRarity"><option value="">Rareza: todas</option></select>
+      <select class="filter" id="filterColor"><option value="">Color: todos</option></select>
+      <div id="colBtnWrap">
+        <button class="btn small ghost" id="btnColumns">Columnas ▾</button>
+        <div id="columnsMenu"></div>
+      </div>
+      <span class="count-pill" id="rowCount"></span>
+    </div>
+    <div class="table-wrap" id="tableWrap"></div>
+  </div>
+
+  <div id="inspector" style="display:none">
+    <button class="mobile-panel-close" id="btnCloseInspectorMobile" aria-label="Cerrar">✕</button>
+    <div class="insp-empty" id="inspectorEmpty">Selecciona una fila para ver el detalle aquí.</div>
+    <div class="insp-scroll" id="inspectorBody" style="display:none"></div>
+  </div>
+
+</div>
+
+<div id="panelBackdrop"></div>
+
+<button class="fab" id="btnFabInspector" title="Ver detalle" aria-label="Ver detalle de la carta seleccionada">▤</button>
+
+<div id="collPopoverOverlay">
+  <div id="collPopover">
+    <div class="cp-head">
+      <div class="cp-head-main">
+        <div class="cp-thumb" id="cpThumb"></div>
+        <div style="min-width:0">
+          <h3 id="cpTitle">Mi colección</h3>
+          <div class="cp-sub" id="cpSub"></div>
+        </div>
+      </div>
+      <button class="cp-close" id="cpClose">✕</button>
+    </div>
+    <div class="cp-body" id="cpBody"></div>
+    <div class="cp-foot">
+      <button class="btn small" id="cpDone">Listo</button>
+    </div>
+  </div>
+</div>
+
+<div id="imgLightboxOverlay">
+  <div id="imgLightboxFrame">
+    <button id="lightboxClose">✕</button>
+    <img id="imgLightboxImg" src="" alt="">
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   STATE
+========================================================================= */
+const S = {
+  raw:null,            // full parsed JSON
+  root:null,            // resolved data root
+  mode:null,            // 'single-set' | 'multi-set' | 'flat-cards' | 'unknown'
+  setInfo:null,         // active Set object (for single/multi set modes)
+  categories:{},        // { key: {label, icon, items:[...], kind:'cards'|'generic', path} }
+  activeCategoryKey:null,
+  activeList:[],         // full list for active category
+  filteredList:[],       // after search/filter
+  sortKey:null, sortDir:1,
+  selectedItem:null,
+  fileName:'',
+  uuidIndex:new Map(),        // uuid -> card, rebuilt per loaded file
+  collection:new Map(),       // uuid -> { variants:{normal:0,foil:0,...}, acquired:'YYYY-MM-DD'|null }
+  preferences:{ imageMode:'normal' },
+  searchScope:'all',          // 'all' | 'name' | 'artist'
+  collectionView:'all',       // 'all' | 'have' | 'missing' | 'incomplete'
+  visibleColumns:['collection','have','normal','foil','surge'], // toggleable extra columns
+  uiState:{ sidebarHidden:false, inspectorHidden:false },
+};
+
+const COLLECTION_STATE_KEY = 'mtgjson_explorer_state';
+const COLLECTION_DATA_KEY = 'mtgjson_collection_v1';
+
+/* Known special-foil promoTypes -> friendly label. Extend freely; anything
+   not listed here just falls back to a plain "Foil" variant. This keeps the
+   detector flexible for future MTGJSON files without hardcoding a card list. */
+const SPECIAL_FOIL_PROMO_MAP = {
+  surgefoil:'Surge Foil', fracturefoil:'Fracture Foil', galaxyfoil:'Galaxy Foil',
+  texturedfoil:'Textured Foil', rainbowfoil:'Rainbow Foil', confettifoil:'Confetti Foil',
+  oilslickfoil:'Oil Slick Foil', stepandcompleatfoil:'Step-and-Compleat Foil',
+  silverfoil:'Silver Foil', doublerainbow:'Double Rainbow Foil', neonink:'Neon Ink Foil',
+  gilded:'Gilded Foil', halofoil:'Halo Foil', invisibleink:'Invisible Ink Foil'
+};
+const EXTRA_COLUMN_DEFS = [
+  { key:'collection', label:'Colección' },
+  { key:'have',        label:'Tengo' },
+  { key:'normal',       label:'Normal' },
+  { key:'foil',         label:'Foil' },
+  { key:'surge',        label:'Surge' },
+  { key:'obtained',     label:'Variantes obtenidas' },
+  { key:'existing',     label:'Variantes existentes' },
+  { key:'complete',     label:'Completada' },
+];
+
+const CARD_LIKE_KEYS = ['manaCost','type','rarity','colorIdentity','convertedManaCost','manaValue'];
+const CATEGORY_DEFS = [
+  { key:'cards',        label:'Cards',    icon:'🂠' },
+  { key:'tokens',       label:'Tokens',   icon:'◆' },
+  { key:'decks',        label:'Decks',    icon:'📚' },
+  { key:'sealedProduct',label:'Sealed',   icon:'📦' },
+  { key:'booster',      label:'Boosters', icon:'🎁' },
+  { key:'boosters',     label:'Boosters', icon:'🎁' },
+];
+
+/* =========================================================================
+   UTILITIES
+========================================================================= */
+function isPlainObject(v){ return v !== null && typeof v === 'object' && !Array.isArray(v); }
+function isArrayOfObjects(v){ return Array.isArray(v) && v.length>0 && isPlainObject(v[0]); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function scryfallImg(scryfallId, size){
+  if(!scryfallId) return null;
+  const id = scryfallId; size = size || 'normal';
+  return `https://cards.scryfall.io/${size}/front/${id[0]}/${id[1]}/${id}.jpg`;
+}
+function looksLikeCard(obj){
+  if(!isPlainObject(obj)) return false;
+  if(!obj.name) return false;
+  return CARD_LIKE_KEYS.some(k=>k in obj) || (obj.identifiers && isPlainObject(obj.identifiers));
+}
+function debounce(fn, ms){ let t; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), ms); }; }
+
+/* =========================================================================
+   COLLECTION — variant detection, storage, status
+   Physical-collection state lives entirely in S.collection (Map keyed by
+   card uuid) and is kept fully separate from the original MTGJSON data.
+========================================================================= */
+
+// Determines which physical variants really exist for a given card print,
+// based on its own `finishes` + `promoTypes` — never a hardcoded list.
+// Each MTGJSON "card" object already represents a single print/number, so
+// a special foil (e.g. surgefoil) shows up as its own object whose
+// `finishes` says only ['foil'] while `promoTypes` names the real finish.
+function getCardVariants(card){
+  const finishes = card.finishes || [];
+  const promoTypes = card.promoTypes || [];
+  const variants = [];
+  if(finishes.includes('nonfoil')) variants.push({ key:'normal', label:'Normal' });
+  if(finishes.includes('foil')){
+    const specialKey = promoTypes.find(p=>SPECIAL_FOIL_PROMO_MAP[p]);
+    if(specialKey) variants.push({ key:specialKey, label:SPECIAL_FOIL_PROMO_MAP[specialKey] });
+    else variants.push({ key:'foil', label:'Foil' });
+  }
+  if(finishes.includes('etched')) variants.push({ key:'etched', label:'Etched' });
+  return variants;
+}
+// Cache per-card variant lists keyed by uuid so we don't recompute repeatedly.
+const variantCache = new Map();
+function cardVariants(card){
+  if(!card.uuid) return getCardVariants(card);
+  if(!variantCache.has(card.uuid)) variantCache.set(card.uuid, getCardVariants(card));
+  return variantCache.get(card.uuid);
+}
+// Convenience: does this card have ANY variant capable of a foil-style render?
+function cardHasFoilVariant(card){
+  return cardVariants(card).some(v=>v.key!=='normal');
+}
+
+function getCollectionEntry(uuid){
+  return S.collection.get(uuid) || { variants:{}, acquired:null };
+}
+function ensureCollectionEntry(uuid){
+  let e = S.collection.get(uuid);
+  if(!e){ e = { variants:{}, acquired:null }; S.collection.set(uuid, e); }
+  return e;
+}
+// Each variant now tracks quantity per language: { en: n, other: n }.
+// Older saved collections stored a plain number per variant — read as
+// { en:number, other:0 } so existing data keeps working untouched.
+function variantLangQty(entry, variantKey){
+  const v = entry.variants[variantKey];
+  if(v==null) return { en:0, other:0 };
+  if(typeof v === 'number') return { en:v, other:0 };
+  return { en:v.en||0, other:v.other||0 };
+}
+function variantTotalQty(entry, variantKey){
+  const q = variantLangQty(entry, variantKey);
+  return q.en + q.other;
+}
+function setVariantQty(uuid, variantKey, lang, qty){
+  qty = Math.max(0, Math.floor(Number(qty)||0));
+  const entry = ensureCollectionEntry(uuid);
+  const cur = variantLangQty(entry, variantKey);
+  cur[lang==='other'?'other':'en'] = qty;
+  if(cur.en===0 && cur.other===0) delete entry.variants[variantKey];
+  else entry.variants[variantKey] = cur;
+  const hasAny = Object.keys(entry.variants).length>0;
+  if(hasAny && !entry.acquired) entry.acquired = todayISO();
+  if(!hasAny) S.collection.delete(uuid);
+  saveCollection();
+}
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+
+// status: 'none' | 'partial' | 'complete'
+function collectionStatus(card){
+  const variants = cardVariants(card);
+  if(!variants.length) return 'none';
+  const entry = S.collection.get(card.uuid);
+  if(!entry) return 'none';
+  let have = 0;
+  variants.forEach(v=>{ if(variantTotalQty(entry, v.key) > 0) have++; });
+  if(have===0) return 'none';
+  if(have>=variants.length) return 'complete';
+  return 'partial';
+}
+function collectionCounts(card){
+  const variants = cardVariants(card);
+  const entry = S.collection.get(card.uuid);
+  let have = 0;
+  variants.forEach(v=>{ if(entry && variantTotalQty(entry, v.key)>0) have++; });
+  return { have, total: variants.length };
+}
+function qtyOf(card, variantKey){
+  const entry = S.collection.get(card.uuid);
+  return entry ? variantTotalQty(entry, variantKey) : 0;
+}
+
+/* ---- persistence ---- */
+function saveCollection(){
+  try{
+    const obj = {};
+    S.collection.forEach((v,k)=>{ obj[k] = v; });
+    localStorage.setItem(COLLECTION_DATA_KEY, JSON.stringify({ version:1, collection:obj, preferences:S.preferences }));
+  }catch(e){ console.warn('No se pudo guardar la colección', e); }
+}
+function loadCollection(){
+  try{
+    const raw = localStorage.getItem(COLLECTION_DATA_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    S.collection = new Map(Object.entries(parsed.collection||{}));
+    if(parsed.preferences) S.preferences = Object.assign(S.preferences, parsed.preferences);
+  }catch(e){ console.warn('No se pudo leer la colección guardada', e); }
+}
+function saveAppState(){
+  try{
+    const state = {
+      view:S.collectionView,
+      searchScope:S.searchScope,
+      search:document.getElementById('searchBox') ? document.getElementById('searchBox').value : '',
+      selectedUuid:S.selectedItem ? S.selectedItem.uuid : null,
+      sortKey:S.sortKey, sortDir:S.sortDir,
+      visibleColumns:S.visibleColumns,
+      activeCategoryKey:S.activeCategoryKey,
+      uiState:S.uiState,
+    };
+    localStorage.setItem(COLLECTION_STATE_KEY, JSON.stringify(state));
+  }catch(e){ /* ignore */ }
+}
+const saveAppStateDebounced = debounce(saveAppState, 300);
+function loadAppState(){
+  try{
+    const raw = localStorage.getItem(COLLECTION_STATE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+/* ---- export / import ---- */
+function exportCollection(){
+  const obj = {};
+  S.collection.forEach((v,k)=>{ obj[k]=v; });
+  const payload = { version:1, collection:obj, preferences:S.preferences };
+  downloadJSON(payload, 'coleccion.json');
+}
+function importCollectionFile(file){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    let parsed;
+    try{ parsed = JSON.parse(e.target.result); }
+    catch(err){ alert('No se pudo leer el archivo: '+err.message); return; }
+    const incoming = parsed.collection || {};
+    const incomingKeys = Object.keys(incoming);
+    if(!incomingKeys.length){ alert('El archivo no contiene datos de colección.'); return; }
+    let matched = 0, ignored = 0;
+    const replaceAll = S.collection.size>0 && confirm('¿Reemplazar completamente tu colección actual con la importada?\n\nAceptar = reemplazar todo.\nCancelar = combinar (mantener lo que ya tienes y sumar/actualizar lo importado).');
+    if(replaceAll) S.collection = new Map();
+    incomingKeys.forEach(uuid=>{
+      if(!S.uuidIndex.has(uuid)){ ignored++; return; }
+      matched++;
+      S.collection.set(uuid, incoming[uuid]);
+    });
+    if(parsed.preferences) S.preferences = Object.assign(S.preferences, parsed.preferences);
+    saveCollection();
+    applyImageModeUI();
+    applyFiltersAndRender();
+    if(S.selectedItem) selectItem(S.selectedItem);
+    alert(`Importación completa. ${matched} carta(s) actualizadas. ${ignored} ignoradas (no están en el archivo cargado actualmente).`);
+  };
+  reader.onerror = ()=> alert('Error al leer el archivo.');
+  reader.readAsText(file);
+}
+
+/* =========================================================================
+   STRUCTURE DETECTION
+   Never assumes a fixed path like data.TMT.cards — walks the JSON generically
+   so it keeps working across MTGJSON file types and future schema changes.
+========================================================================= */
+function analyze(json){
+  const root = (json && isPlainObject(json) && 'data' in json) ? json.data : json;
+  S.raw = json; S.root = root; S.categories = {};
+
+  // --- Case 1: root itself looks like a single Set (has a cards array) ---
+  if(isPlainObject(root) && Array.isArray(root.cards)){
+    S.mode = 'single-set';
+    S.setInfo = root;
+    buildCategoriesFromSet(root);
+    return;
+  }
+
+  // --- Case 2: root is a dictionary. Inspect a sample value. ---
+  if(isPlainObject(root)){
+    const entries = Object.entries(root);
+    if(entries.length){
+      const [sampleKey, sampleVal] = entries[0];
+
+      // 2a: Record<setCode, Set>  (AllPrintings.json style)
+      if(isPlainObject(sampleVal) && Array.isArray(sampleVal.cards)){
+        S.mode = 'multi-set';
+        S.allSets = root;
+        // default to the first set; UI lets the user pick another if present
+        S.setInfo = sampleVal;
+        S.setInfo.code = S.setInfo.code || sampleKey;
+        buildCategoriesFromSet(S.setInfo, Object.keys(root));
+        return;
+      }
+
+      // 2b: Record<uuid/name, Card>  (AllIdentifiers.json / AtomicCards.json style)
+      if(looksLikeCard(sampleVal) || (isPlainObject(sampleVal) && Array.isArray(sampleVal))){
+        S.mode = 'flat-cards';
+        S.setInfo = { name: 'Colección de cartas', code: '', cards: [] };
+        const flatCards = [];
+        for(const [k,v] of entries){
+          if(looksLikeCard(v)) flatCards.push(v);
+          else if(Array.isArray(v)) v.forEach(c=>{ if(looksLikeCard(c)) flatCards.push(c); });
+        }
+        S.setInfo.cards = flatCards;
+        S.categories.cards = { label:'Cards', icon:'🂠', items:flatCards, kind:'cards' };
+        return;
+      }
+    }
+  }
+
+  // --- Case 3: fallback — BFS the whole tree for recognisable arrays ---
+  S.mode = 'unknown';
+  S.setInfo = { name: 'Archivo JSON', code:'' };
+  const found = bfsFindArrays(root, 5);
+  found.forEach(f=>{
+    const kind = isArrayOfObjects(f.value) && looksLikeCard(f.value[0]) ? 'cards' : 'generic';
+    if(!S.categories[f.key] || S.categories[f.key].items.length < f.value.length){
+      S.categories[f.key] = { label: titleCase(f.key), icon: kind==='cards' ? '🂠' : '🗂️', items:f.value, kind, path:f.path };
+    }
+  });
+}
+
+function buildCategoriesFromSet(setInfo, allSetCodes){
+  S.allSetCodes = allSetCodes || null;
+  Object.keys(setInfo).forEach(k=>{
+    const v = setInfo[k];
+    if(Array.isArray(v) && v.length>0 && isPlainObject(v[0])){
+      const kind = looksLikeCard(v[0]) ? 'cards' : 'generic';
+      const def = CATEGORY_DEFS.find(d=>d.key===k);
+      S.categories[k] = { label: def ? def.label : titleCase(k), icon: def ? def.icon : '🗂️', items:v, kind };
+    } else if(isPlainObject(v) && Object.keys(v).length>0 && k!=='identifiers' && k!=='translations'){
+      // e.g. "booster": { collector:{...}, play:{...} } -> keep as generic single object category
+      const def = CATEGORY_DEFS.find(d=>d.key===k);
+      if(def){
+        S.categories[k] = { label: def.label, icon: def.icon, items:[v], kind:'object', single:true };
+      }
+    }
+  });
+  if(!S.categories.cards) S.categories.cards = { label:'Cards', icon:'🂠', items:[], kind:'cards' };
+}
+
+function titleCase(s){
+  return s.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase()).trim();
+}
+
+// Breadth-first search across the whole JSON tree for arrays-of-objects,
+// tagged by the property key they were found under. This is what lets the
+// app keep working even if MTGJSON nests things differently in future.
+function bfsFindArrays(root, maxDepth){
+  const results = [];
+  const seen = new Set();
+  const queue = [{node:root, depth:0, path:'$'}];
+  while(queue.length){
+    const {node, depth, path} = queue.shift();
+    if(depth > maxDepth || node==null || typeof node !== 'object') continue;
+    if(Array.isArray(node)){
+      continue; // arrays are only interesting via their parent key, handled below
+    }
+    for(const key of Object.keys(node)){
+      const val = node[key];
+      const childPath = path+'.'+key;
+      if(Array.isArray(val) && isArrayOfObjects(val) && !seen.has(childPath)){
+        seen.add(childPath);
+        results.push({ key, value:val, path:childPath });
+      } else if(isPlainObject(val)){
+        queue.push({node:val, depth:depth+1, path:childPath});
+      }
+    }
+  }
+  return results;
+}
+
+/* =========================================================================
+   RENDER: SIDEBAR — DETECTED CATEGORIES
+========================================================================= */
+function renderSetHeader(){
+  const el = document.getElementById('setHeader');
+  const info = S.setInfo || {};
+  let metaBits = [];
+  if(info.code) metaBits.push(info.code);
+  if(info.releaseDate) metaBits.push(info.releaseDate);
+  if(info.totalSetSize) metaBits.push(info.totalSetSize+' impresas');
+  else if(info.baseSetSize) metaBits.push(info.baseSetSize+' cartas');
+  el.innerHTML = `<div class="name">${esc(info.name||'Archivo JSON')}</div><div class="meta">${esc(metaBits.join(' · ') || S.mode)}</div>`;
+}
+
+function renderNav(){
+  const el = document.getElementById('navGroup');
+  const keys = Object.keys(S.categories);
+  if(!keys.length){ el.innerHTML = '<div class="nav-empty">No se detectaron colecciones reconocibles. Revisa la pestaña «Árbol JSON».</div>'; return; }
+  const collNavHtml = `
+    <div class="nav-label">Mi colección física</div>
+    <div class="nav-item" data-collview="all"><span class="ic">🂠</span><span class="lbl">Todas</span></div>
+    <div class="nav-item" data-collview="have"><span class="ic">🟢</span><span class="lbl">Mi colección</span></div>
+    <div class="nav-item" data-collview="missing"><span class="ic">⚪</span><span class="lbl">Me faltan</span></div>
+    <div class="nav-item" data-collview="incomplete"><span class="ic">🟡</span><span class="lbl">Incompletas</span></div>
+  `;
+  el.innerHTML = collNavHtml + '<div class="nav-label">Colecciones detectadas</div>' + keys.map(k=>{
+    const c = S.categories[k];
+    const n = c.single ? '' : c.items.length;
+    return `<div class="nav-item" data-cat="${esc(k)}"><span class="ic">${c.icon}</span><span class="lbl">${esc(c.label)}</span><span class="cnt">${n}</span></div>`;
+  }).join('');
+  el.querySelectorAll('.nav-item[data-cat]').forEach(n=>{
+    n.addEventListener('click', ()=> selectCategory(n.dataset.cat));
+  });
+  el.querySelectorAll('.nav-item[data-collview]').forEach(n=>{
+    n.addEventListener('click', ()=>{
+      S.collectionView = n.dataset.collview;
+      setActiveCollectionNav(S.collectionView);
+      applyFiltersAndRender();
+      saveAppStateDebounced();
+    });
+  });
+  setActiveCollectionNav(S.collectionView);
+}
+function setActiveCollectionNav(view){
+  document.querySelectorAll('.nav-item[data-collview]').forEach(n=>{
+    n.classList.toggle('active', n.dataset.collview===view);
+  });
+}
+
+function selectCategory(key, opts){
+  opts = opts || {};
+  S.activeCategoryKey = key;
+  document.querySelectorAll('.nav-item[data-cat]').forEach(n=>n.classList.toggle('active', n.dataset.cat===key));
+  const cat = S.categories[key];
+  if(!cat) return;
+  S.activeList = cat.items;
+  if(!opts.skipReset){
+    S.sortKey = null; S.sortDir = 1;
+    document.getElementById('searchBox').value='';
+    S.collectionView = 'all';
+    setActiveCollectionNav('all');
+  }
+  buildFilters(cat);
+  buildColumnsMenu();
+  if(!opts.skipReset) applyFiltersAndRender();
+  saveAppStateDebounced();
+}
+
+/* =========================================================================
+   TABLE
+========================================================================= */
+const CARD_COLUMNS = [
+  { key:'number', label:'#' },
+  { key:'name', label:'Nombre' },
+  { key:'rarity', label:'Rareza' },
+  { key:'type', label:'Tipo' },
+  { key:'manaCost', label:'Coste' },
+  { key:'colors', label:'Colores' },
+  { key:'finishes', label:'Foil' },
+  { key:'promoTypes', label:'Promo' },
+];
+
+function buildFilters(cat){
+  const rSel = document.getElementById('filterRarity');
+  const cSel = document.getElementById('filterColor');
+  const colWrap = document.getElementById('colBtnWrap');
+  const scopeSel = document.getElementById('searchScope');
+  if(cat.kind !== 'cards'){
+    rSel.style.display='none'; cSel.style.display='none';
+    colWrap.style.display='none'; scopeSel.style.display='none';
+    return;
+  }
+  rSel.style.display=''; cSel.style.display='';
+  colWrap.style.display=''; scopeSel.style.display='';
+  const rarities = Array.from(new Set(cat.items.map(c=>c.rarity).filter(Boolean))).sort();
+  rSel.innerHTML = '<option value="">Rareza: todas</option>' + rarities.map(r=>`<option value="${esc(r)}">${esc(titleCase(r))}</option>`).join('');
+  const colorSet = new Set();
+  cat.items.forEach(c=> (c.colors||[]).forEach(col=>colorSet.add(col)));
+  const colorOrder = ['W','U','B','R','G'];
+  const colors = colorOrder.filter(c=>colorSet.has(c)).concat([...colorSet].filter(c=>!colorOrder.includes(c)));
+  cSel.innerHTML = '<option value="">Color: todos</option>' + colors.map(c=>`<option value="${c}">${c}</option>`).join('') + (colorSet.size? '<option value="C">Incoloro</option>':'');
+}
+
+function applyFiltersAndRender(){
+  const cat = S.categories[S.activeCategoryKey];
+  if(!cat) return;
+  const term = document.getElementById('searchBox').value.trim().toLowerCase();
+  const rarity = document.getElementById('filterRarity').value;
+  const color = document.getElementById('filterColor').value;
+
+  let list = cat.items;
+  if(term){
+    list = list.filter(item=>{
+      if(cat.kind==='cards'){
+        // Búsqueda explícita por número de carta (collector number).
+        // Si el término es sólo numérico, 287 encuentra únicamente la carta #287.
+        if(/^\d+$/.test(term)){
+          return String(item.number ?? '').trim() === term;
+        }
+        if(S.searchScope==='name'){
+          return (item.name||'').toLowerCase().includes(term);
+        }
+        if(S.searchScope==='artist'){
+          return (item.artist||'').toLowerCase().includes(term);
+        }
+      }
+      const hay = JSON.stringify(item).toLowerCase();
+      return hay.includes(term);
+    });
+  }
+  if(cat.kind==='cards'){
+    if(rarity) list = list.filter(c=>c.rarity===rarity);
+    if(color){
+      if(color==='C') list = list.filter(c=>!c.colors || c.colors.length===0);
+      else list = list.filter(c=>(c.colors||[]).includes(color));
+    }
+    if(S.collectionView!=='all'){
+      list = list.filter(c=>{
+        const st = collectionStatus(c);
+        if(S.collectionView==='have') return st==='partial' || st==='complete';
+        if(S.collectionView==='missing') return st==='none';
+        if(S.collectionView==='incomplete') return st==='partial';
+        return true;
+      });
+    }
+  }
+  if(S.sortKey){
+    const key = S.sortKey, dir = S.sortDir;
+    list = list.slice().sort((a,b)=>{
+      let va, vb;
+      if(cat.kind==='cards' && COLLECTION_SORT_ACCESSORS[key]){
+        va = COLLECTION_SORT_ACCESSORS[key](a);
+        vb = COLLECTION_SORT_ACCESSORS[key](b);
+      } else {
+        va = a[key]; vb = b[key];
+        if(Array.isArray(va)) va = va.join(',');
+        if(Array.isArray(vb)) vb = vb.join(',');
+      }
+      if(key==='number' || COLLECTION_SORT_ACCESSORS[key]){
+        const na=parseFloat(va), nb=parseFloat(vb); if(!isNaN(na)&&!isNaN(nb)) return (na-nb)*dir;
+      }
+      va = (va==null?'':va).toString().toLowerCase();
+      vb = (vb==null?'':vb).toString().toLowerCase();
+      if(va<vb) return -1*dir; if(va>vb) return 1*dir; return 0;
+    });
+  }
+  S.filteredList = list;
+  renderTable(cat, list);
+  document.getElementById('rowCount').textContent = `${list.length} / ${cat.items.length}`;
+  saveAppStateDebounced();
+}
+
+// Accessors used when sorting by the new collection-derived columns.
+const COLLECTION_SORT_ACCESSORS = {
+  have: c=> collectionStatus(c)==='none' ? 0 : 1,
+  normal: c=> qtyOf(c,'normal'),
+  foil: c=> qtyOf(c,'foil'),
+  surge: c=> qtyOf(c,'surgefoil'),
+  obtained: c=> collectionCounts(c).have,
+  existing: c=> collectionCounts(c).total,
+  complete: c=> collectionStatus(c)==='complete' ? 1 : 0,
+};
+
+function renderTable(cat, list){
+  const wrap = document.getElementById('tableWrap');
+  if(!list.length){
+    wrap.innerHTML = `<div class="empty-state"><div class="big">Sin resultados</div>Ajusta la búsqueda o los filtros.</div>`;
+    return;
+  }
+  if(cat.kind==='cards'){ renderCardTable(wrap, list); return; }
+  renderGenericTable(wrap, list);
+}
+
+function activeExtraColumns(){
+  return EXTRA_COLUMN_DEFS.filter(c=>S.visibleColumns.includes(c.key));
+}
+
+function renderCardTable(wrap, list){
+  const extraCols = activeExtraColumns();
+  const thead = `<thead><tr>${CARD_COLUMNS.map(c=>`<th data-key="${c.key}">${esc(c.label)}${sortArrow(c.key)}</th>`).join('')}${extraCols.map(c=>`<th data-key="${c.key}" class="mono">${esc(c.label)}${sortArrow(c.key)}</th>`).join('')}</tr></thead>`;
+  const rows = list.map((card, i)=>{
+    const foil = (card.finishes||[]).includes('foil') ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
+    const promo = (card.promoTypes && card.promoTypes.length) ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
+    return `<tr data-idx="${i}" data-uuid="${esc(card.uuid||'')}">
+      <td class="mono">${esc(card.number ?? '')}</td>
+      <td>${esc(card.name || '')}</td>
+      <td><span class="pill ${esc(card.rarity||'')}">${esc(card.rarity||'')}</span></td>
+      <td class="dim">${esc(card.type || (card.types? card.types.join(' '):''))}</td>
+      <td class="mono">${esc(card.manaCost || '')}</td>
+      <td>${manaPips(card.colors)}</td>
+      <td>${foil}</td>
+      <td>${promo}</td>
+      ${extraCols.map(c=>`<td data-colcell="${c.key}">${renderExtraCell(c.key, card)}</td>`).join('')}
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table>${thead}<tbody>${rows}</tbody></table>`;
+  attachTableEvents(wrap, list);
+  wrap.querySelectorAll('.coll-editbtn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const uuid = btn.closest('tr').dataset.uuid;
+      const card = S.uuidIndex.get(uuid);
+      if(card) openCollectionPopover(card);
+    });
+  });
+}
+
+function renderExtraCell(key, card){
+  const variants = cardVariants(card);
+  const status = collectionStatus(card);
+  switch(key){
+    case 'collection':{
+      const dotClass = status==='complete'?'complete':status==='partial'?'partial':'none';
+      const dotChar = status==='complete'?'🟢':status==='partial'?'🟡':'⚪';
+      return `<div class="coll-cell"><span title="${status}">${dotChar}</span><button class="coll-editbtn">Editar</button></div>`;
+    }
+    case 'have':{
+      const c = collectionCounts(card);
+      return c.have>0 ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
+    }
+    case 'normal':{
+      const has = variants.some(v=>v.key==='normal');
+      if(!has) return '<span class="dim">—</span>';
+      const q = qtyOf(card,'normal');
+      return `<span class="coll-qty ${q===0?'zero':''}">${q}</span>`;
+    }
+    case 'foil':{
+      const v = variants.find(vv=>vv.key==='foil');
+      if(!v) return '<span class="dim">—</span>';
+      const q = qtyOf(card,'foil');
+      return `<span class="coll-qty ${q===0?'zero':''}">${q}</span>`;
+    }
+    case 'surge':{
+      const v = variants.find(vv=>vv.key==='surgefoil');
+      if(!v) return '<span class="dim">—</span>';
+      const q = qtyOf(card,'surgefoil');
+      return `<span class="coll-qty ${q===0?'zero':''}">${q}</span>`;
+    }
+    case 'obtained':{
+      const c = collectionCounts(card);
+      return `<span class="coll-qty">${c.have}</span>`;
+    }
+    case 'existing':{
+      const c = collectionCounts(card);
+      return `<span class="coll-qty">${c.total}</span>`;
+    }
+    case 'complete':
+      return status==='complete' ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
+    default: return '';
+  }
+}
+
+/* Updates just the affected row/cells + inspector + counters after a qty
+   change, instead of re-rendering the whole table (see task perf notes). */
+function refreshCardRow(card){
+  const tr = document.querySelector(`#tableWrap tr[data-uuid="${cssEsc(card.uuid)}"]`);
+  if(tr){
+    activeExtraColumns().forEach(c=>{
+      const td = tr.querySelector(`td[data-colcell="${c.key}"]`);
+      if(td){
+        td.innerHTML = renderExtraCell(c.key, card);
+        const btn = td.querySelector('.coll-editbtn');
+        if(btn) btn.addEventListener('click', (e)=>{ e.stopPropagation(); openCollectionPopover(card); });
+      }
+    });
+  }
+  if(S.selectedItem && S.selectedItem.uuid===card.uuid) refreshInspectorCollection(card);
+  if(S.collectionView!=='all') applyFiltersAndRender(); // membership in this view may have changed
+}
+function cssEsc(s){ return String(s||'').replace(/["\\]/g, '\\$&'); }
+
+function manaPips(colors){
+  if(!colors || !colors.length) return '<span class="dim">—</span>';
+  return `<span class="mana-pips">${colors.map(c=>`<span class="pip ${esc(c)}">${esc(c)}</span>`).join('')}</span>`;
+}
+
+function renderGenericTable(wrap, list){
+  // Infer columns from the union of scalar keys across the first N items.
+  const sample = list.slice(0, 25);
+  const keySet = [];
+  sample.forEach(obj=>{
+    Object.keys(obj).forEach(k=>{
+      const v = obj[k];
+      if(keySet.includes(k)) return;
+      if(v==null || typeof v==='string' || typeof v==='number' || typeof v==='boolean') keySet.push(k);
+    });
+  });
+  const cols = keySet.slice(0,7);
+  const thead = `<thead><tr>${cols.map(c=>`<th data-key="${c}">${esc(titleCase(c))}${sortArrow(c)}</th>`).join('')}</tr></thead>`;
+  const rows = list.map((item,i)=>`<tr data-idx="${i}">${cols.map(c=>{
+      const v = item[c];
+      return `<td class="${typeof v==='number'?'mono':''}">${esc(v==null?'':v)}</td>`;
+    }).join('')}</tr>`).join('');
+  wrap.innerHTML = `<table>${thead}<tbody>${rows}</tbody></table>`;
+  attachTableEvents(wrap, list);
+}
+
+function buildColumnsMenu(){
+  const menu = document.getElementById('columnsMenu');
+  const cat = S.categories[S.activeCategoryKey];
+  if(!cat || cat.kind!=='cards'){ menu.innerHTML = ''; return; }
+  // Only offer variant columns that actually occur somewhere in this file.
+  const existingVariantKeys = new Set();
+  cat.items.forEach(c=> cardVariants(c).forEach(v=>existingVariantKeys.add(v.key)));
+  menu.innerHTML = '<div class="cm-title">Mostrar columnas</div>' + EXTRA_COLUMN_DEFS.map(c=>{
+    let disabled = false;
+    if(c.key==='normal' && !existingVariantKeys.has('normal')) disabled = true;
+    if(c.key==='foil' && !existingVariantKeys.has('foil')) disabled = true;
+    if(c.key==='surge' && !existingVariantKeys.has('surgefoil')) disabled = true;
+    const checked = S.visibleColumns.includes(c.key);
+    return `<label><input type="checkbox" data-colkey="${c.key}" ${checked?'checked':''} ${disabled?'disabled':''}> ${esc(c.label)}</label>`;
+  }).join('');
+  menu.querySelectorAll('input[data-colkey]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const key = inp.dataset.colkey;
+      if(inp.checked){ if(!S.visibleColumns.includes(key)) S.visibleColumns.push(key); }
+      else { S.visibleColumns = S.visibleColumns.filter(k=>k!==key); }
+      applyFiltersAndRender();
+      saveAppStateDebounced();
+    });
+  });
+}
+
+function sortArrow(key){
+  if(S.sortKey!==key) return '';
+  return `<span class="arrow">${S.sortDir===1?'▲':'▼'}</span>`;
+}
+
+function attachTableEvents(wrap, list){
+  wrap.querySelectorAll('th[data-key]').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.key;
+      if(S.sortKey===key) S.sortDir *= -1; else { S.sortKey=key; S.sortDir=1; }
+      applyFiltersAndRender();
+    });
+  });
+  wrap.querySelectorAll('tbody tr').forEach(tr=>{
+    tr.addEventListener('click', ()=>{
+      wrap.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));
+      tr.classList.add('selected');
+      const idx = parseInt(tr.dataset.idx,10);
+      selectItem(list[idx]);
+    });
+  });
+}
+
+/* =========================================================================
+   INSPECTOR
+========================================================================= */
+const INSPECTOR_TABS = [
+  { key:'general', label:'General' },
+  { key:'ids', label:'Identificadores' },
+  { key:'urls', label:'URLs de compra' },
+  { key:'legal', label:'Legalidades' },
+  { key:'foreign', label:'Datos extranjeros' },
+  { key:'prices', label:'Precios' },
+  { key:'raw', label:'JSON crudo' },
+];
+
+function selectItem(item){
+  S.selectedItem = item;
+  document.getElementById('inspectorEmpty').style.display='none';
+  const body = document.getElementById('inspectorBody');
+  body.style.display='block';
+
+  const cat = S.categories[S.activeCategoryKey];
+  if(cat && cat.kind==='cards'){ renderCardInspector(body, item); }
+  else{ renderGenericInspector(body, item); }
+  saveAppStateDebounced();
+  if(isMobileView()){
+    mobilePanels.inspector = true;
+    mobilePanels.sidebar = false;
+    updateShellLayout();
+  }
+}
+
+function scgSearchUrl(name){
+  return `https://starcitygames.com/search/?search_query=${encodeURIComponent(name||'')}`;
+}
+
+function renderCardInspector(body, card){
+  const img = card.identifiers && card.identifiers.scryfallId ? scryfallImg(card.identifiers.scryfallId, 'large') : null;
+  const hasFoilVariant = cardHasFoilVariant(card);
+  const effectiveMode = (S.preferences.imageMode==='foil' && hasFoilVariant) ? 'foil' : 'normal';
+  const isFoil = effectiveMode==='foil';
+
+  body.innerHTML = `
+    <div class="insp-hero">
+      <div class="card-frame ${isFoil?'foil':''}">
+        ${img ? `<img src="${esc(img)}" alt="${esc(card.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=noimg>Sin imagen disponible</span>'">` : `<span class="noimg">Sin imagen disponible</span>`}
+      </div>
+    </div>
+    <div class="imgmode-toggle">
+      <button type="button" data-mode="normal" class="${effectiveMode==='normal'?'active':''}">Visualizar: Normal</button>
+      <button type="button" data-mode="foil" ${hasFoilVariant?'':'disabled'} class="${effectiveMode==='foil'?'active':''}">Visualizar: Foil</button>
+    </div>
+    <div class="insp-title">
+      <h2>${esc(card.name||'')}</h2>
+      <div class="type">${esc(card.type || (card.types?card.types.join(' '):''))}</div>
+    </div>
+    <div class="insp-badges">
+      <span class="pill ${esc(card.rarity||'')}">${esc(card.rarity||'')}</span>
+      ${manaPips(card.colors)}
+      ${card.manaCost? `<span class="mono dim">${esc(card.manaCost)}</span>`:''}
+      ${card.power!=null? `<span class="mono dim">${esc(card.power)}/${esc(card.toughness)}</span>`:''}
+    </div>
+    <div class="insp-actions">
+      ${card.identifiers && card.identifiers.scryfallId ? `<button class="btn small" id="btnOpenScry">Abrir en Scryfall</button>`:''}
+      <button class="btn small primary" id="btnOpenSCG">Ver precio en Star City Games</button>
+    </div>
+    <div class="insp-mycoll" id="inspMyColl">${renderInspMyCollHtml(card)}</div>
+  `;
+
+  const scryBtn = document.getElementById('btnOpenScry');
+  if(scryBtn) scryBtn.addEventListener('click', ()=>window.open(`https://scryfall.com/search?q=%21%22${encodeURIComponent(card.name||'')}%22`, '_blank'));
+  document.getElementById('btnOpenSCG').addEventListener('click', ()=>window.open(scgSearchUrl(card.name), '_blank'));
+
+  body.querySelectorAll('.imgmode-toggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ if(!btn.disabled) setImageMode(btn.dataset.mode); });
+  });
+  const frameEl = body.querySelector('.card-frame');
+  if(frameEl && img){
+    frameEl.addEventListener('click', ()=> openImageLightbox(card.identifiers.scryfallId, isFoil, card.name));
+  }
+  const editBtn = document.getElementById('btnEditCollFromInsp');
+  if(editBtn) editBtn.addEventListener('click', ()=> openCollectionPopover(card));
+}
+
+function renderInspMyCollHtml(card){
+  const variants = cardVariants(card);
+  const entry = getCollectionEntry(card.uuid);
+  const rows = variants.length
+    ? variants.map(v=>{
+        const q = variantLangQty(entry, v.key);
+        const total = q.en + q.other;
+        const breakdown = total>0 ? ` <span class="dim" style="font-size:10.5px">(EN ${q.en} · Otro ${q.other})</span>` : '';
+        return `<div class="row"><span class="k">${esc(v.label)}</span><span class="v">${total}${breakdown}</span></div>`;
+      }).join('')
+    : '<div class="dim" style="padding:4px 0">Sin variantes físicas detectadas.</div>';
+  const acq = entry.acquired ? `<div class="acq">Adquirida desde: ${esc(entry.acquired)}</div>` : '';
+  return `<h4>Mi colección</h4>${rows}${acq}
+    <div style="margin-top:10px"><button class="btn small" id="btnEditCollFromInsp">Editar colección</button></div>`;
+}
+// Updates only the "Mi colección" block inside the inspector (see task perf
+// notes) instead of re-rendering the whole inspector panel.
+function refreshInspectorCollection(card){
+  const el = document.getElementById('inspMyColl');
+  if(!el) return;
+  el.innerHTML = renderInspMyCollHtml(card);
+  const editBtn = document.getElementById('btnEditCollFromInsp');
+  if(editBtn) editBtn.addEventListener('click', ()=> openCollectionPopover(card));
+}
+
+function renderGeneralTab(card){
+  const rows = [
+    ['Número', card.number], ['Rareza', card.rarity], ['CMC', card.manaValue ?? card.convertedManaCost],
+    ['Colores', (card.colors||[]).join(', ')], ['Identidad de color', (card.colorIdentity||[]).join(', ')],
+    ['Artista', card.artist], ['Idioma', card.language], ['Set', card.setCode],
+    ['UUID', card.uuid],
+  ];
+  return rows.filter(r=>r[1]!==undefined && r[1]!=='').map(r=>fieldRow(r[0], r[1])).join('') || emptyMsg();
+}
+function renderKVTab(obj, emptyText){
+  if(!obj || !Object.keys(obj).length) return emptyMsg(emptyText);
+  return Object.entries(obj).map(([k,v])=>fieldRow(titleCase(k), v)).join('');
+}
+function renderUrlsTab(urls){
+  if(!urls || !Object.keys(urls).length) return emptyMsg();
+  return Object.entries(urls).map(([k,v])=>`<div class="field-row"><span class="k">${esc(titleCase(k))}</span><span class="v"><a href="${esc(v)}" target="_blank" rel="noopener">Abrir ↗</a></span></div>`).join('');
+}
+function renderLegalTab(legal){
+  if(!legal || !Object.keys(legal).length) return emptyMsg();
+  return Object.entries(legal).map(([fmt,status])=>{
+    const ok = /legal/i.test(status);
+    return `<div class="field-row"><span class="k">${esc(titleCase(fmt))}</span><span class="v" style="color:${ok?'var(--g)':'var(--text-faint)'}">${esc(status)}</span></div>`;
+  }).join('');
+}
+function renderForeignTab(fd){
+  if(!fd || !fd.length) return emptyMsg();
+  return fd.map(f=>`<div class="fdata-block"><div class="lang">${esc(f.language||'')}</div><div class="fname">${esc(f.name||'')}</div>${f.text?`<div class="dim" style="margin-top:4px;white-space:pre-wrap">${esc(f.text)}</div>`:''}</div>`).join('');
+}
+function fieldRow(k,v){
+  return `<div class="field-row"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+}
+function emptyMsg(text){ return `<div class="dim" style="padding:10px 0">${esc(text||'No hay datos en este campo para el archivo cargado.')}</div>`; }
+
+function renderGenericInspector(body, item){
+  const name = item.name || item.title || item.uuid || 'Elemento';
+  body.innerHTML = `
+    <div class="insp-title" style="padding-top:16px">
+      <h2>${esc(name)}</h2>
+    </div>
+    <div class="insp-actions">
+      <button class="btn small" id="btnCopyJson">Copiar JSON</button>
+      <button class="btn small" id="btnExportJson">Exportar JSON</button>
+    </div>
+    <div class="tabs-nav"><div class="tab-btn active" data-tab="raw">JSON crudo</div></div>
+    <div class="tab-panel active" id="tab-raw"><pre class="rawjson">${esc(JSON.stringify(item, null, 2))}</pre></div>
+  `;
+  document.getElementById('btnCopyJson').addEventListener('click', ()=>navigator.clipboard && navigator.clipboard.writeText(JSON.stringify(item,null,2)));
+  document.getElementById('btnExportJson').addEventListener('click', ()=>downloadJSON(item, (name||'item')+'.json'));
+}
+
+/* =========================================================================
+   COLLECTION POPOVER (add/edit quantities for the current card)
+========================================================================= */
+let cpCurrentCard = null;
+function openCollectionPopover(card){
+  cpCurrentCard = card;
+  const variants = cardVariants(card);
+  document.getElementById('cpTitle').textContent = card.name || 'Carta';
+  document.getElementById('cpSub').textContent = (card.setCode||'') + (card.number? ' · #'+card.number : '');
+  const thumb = document.getElementById('cpThumb');
+  const thumbImg = card.identifiers && card.identifiers.scryfallId ? scryfallImg(card.identifiers.scryfallId, 'normal') : null;
+  thumb.innerHTML = thumbImg
+    ? `<img src="${esc(thumbImg)}" alt="${esc(card.name||'')}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=noimg>Sin<br>imagen</span>'">`
+    : `<span class="noimg">Sin<br>imagen</span>`;
+  thumb.onclick = thumbImg ? ()=> openImageLightbox(card.identifiers.scryfallId, cardHasFoilVariant(card), card.name) : null;
+  const entry = getCollectionEntry(card.uuid);
+  const body = document.getElementById('cpBody');
+  if(!variants.length){
+    body.innerHTML = '<div class="dim" style="padding:8px 0">Este archivo no especifica variantes físicas (finishes) para esta carta.</div>';
+  } else {
+    body.innerHTML = variants.map(v=>{
+      const q = variantLangQty(entry, v.key);
+      return `<div class="cp-variant-group" data-vkey="${esc(v.key)}">
+        <div class="cp-variant-title">${esc(v.label)}</div>
+        <div class="cp-variant-row" data-lang="en">
+          <span class="cp-label">Inglés</span>
+          <div class="cp-stepper">
+            <button class="cp-dec" type="button">−</button>
+            <input type="number" min="0" step="1" class="cp-qty" value="${q.en}">
+            <button class="cp-inc" type="button">+</button>
+          </div>
+        </div>
+        <div class="cp-variant-row" data-lang="other">
+          <span class="cp-label">Otro idioma</span>
+          <div class="cp-stepper">
+            <button class="cp-dec" type="button">−</button>
+            <input type="number" min="0" step="1" class="cp-qty" value="${q.other}">
+            <button class="cp-inc" type="button">+</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') + `
+      <div class="cp-field">
+        <label>Fecha de adquisición</label>
+        <input type="date" id="cpAcquired" value="${esc(entry.acquired||'')}">
+      </div>`;
+  }
+  document.getElementById('collPopoverOverlay').classList.add('show');
+  if(variants.length){
+    body.querySelectorAll('.cp-variant-group').forEach(group=>{
+      const vkey = group.dataset.vkey;
+      group.querySelectorAll('.cp-variant-row').forEach(row=>{
+        const lang = row.dataset.lang;
+        const input = row.querySelector('.cp-qty');
+        const commit = ()=>{
+          setVariantQty(card.uuid, vkey, lang, input.value);
+          refreshCardRow(card);
+          refreshInspectorCollection(card);
+        };
+        row.querySelector('.cp-inc').addEventListener('click', ()=>{ input.value = (parseInt(input.value,10)||0)+1; commit(); });
+        row.querySelector('.cp-dec').addEventListener('click', ()=>{ input.value = Math.max(0,(parseInt(input.value,10)||0)-1); commit(); });
+        input.addEventListener('change', commit);
+      });
+    });
+    document.getElementById('cpAcquired').addEventListener('change', (e)=>{
+      const entry = ensureCollectionEntry(card.uuid);
+      entry.acquired = e.target.value || null;
+      saveCollection();
+      refreshCardRow(card);
+    });
+  }
+}
+function closeCollectionPopover(){
+  document.getElementById('collPopoverOverlay').classList.remove('show');
+  cpCurrentCard = null;
+}
+
+/* =========================================================================
+   IMAGE MODE (Normal / Foil toggle in inspector)
+========================================================================= */
+function applyImageModeUI(){
+  const wrap = document.querySelector('.imgmode-toggle');
+  if(!wrap) return;
+  wrap.querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mode===S.preferences.imageMode);
+  });
+}
+function setImageMode(mode){
+  S.preferences.imageMode = mode;
+  saveCollection();
+  applyImageModeUI();
+  if(S.selectedItem) selectItem(S.selectedItem);
+}
+
+/* =========================================================================
+   PANEL LAYOUT (show/hide sidebar & inspector to reclaim screen space)
+========================================================================= */
+const MOBILE_BP = 900;
+function isMobileView(){ return window.innerWidth <= MOBILE_BP; }
+const mobilePanels = { sidebar:false, inspector:false };
+
+function closeMobilePanels(){
+  mobilePanels.sidebar = false;
+  mobilePanels.inspector = false;
+  updateShellLayout();
+}
+
+function updateShellLayout(){
+  const shell = document.getElementById('shell');
+  const sidebar = document.getElementById('sidebar');
+  const inspector = document.getElementById('inspector');
+  const backdrop = document.getElementById('panelBackdrop');
+  const fab = document.getElementById('btnFabInspector');
+  const loaded = document.getElementById('landing').style.display === 'none';
+
+  if(isMobileView()){
+    shell.style.gridTemplateColumns = '';
+    if(loaded){
+      sidebar.style.display = 'flex';
+      inspector.style.display = 'flex';
+    }
+    sidebar.classList.toggle('mobile-open', mobilePanels.sidebar);
+    inspector.classList.toggle('mobile-open', mobilePanels.inspector);
+    backdrop.classList.toggle('show', mobilePanels.sidebar || mobilePanels.inspector);
+    fab.classList.toggle('show', loaded && !!S.selectedItem && !mobilePanels.inspector);
+    document.getElementById('btnToggleSidebar').classList.toggle('active', mobilePanels.sidebar);
+    document.getElementById('btnToggleInspector').classList.toggle('active', mobilePanels.inspector);
+    return;
+  }
+
+  backdrop.classList.remove('show');
+  fab.classList.remove('show');
+  sidebar.classList.remove('mobile-open');
+  inspector.classList.remove('mobile-open');
+  const leftW = S.uiState.sidebarHidden ? '0px' : '270px';
+  const rightW = S.uiState.inspectorHidden ? '0px' : '340px';
+  shell.style.gridTemplateColumns = `${leftW} minmax(480px,1fr) ${rightW}`;
+  if(loaded){
+    sidebar.style.display = S.uiState.sidebarHidden ? 'none' : 'flex';
+    inspector.style.display = S.uiState.inspectorHidden ? 'none' : 'flex';
+  }
+  document.getElementById('btnToggleSidebar').classList.toggle('active', !S.uiState.sidebarHidden);
+  document.getElementById('btnToggleInspector').classList.toggle('active', !S.uiState.inspectorHidden);
+}
+function toggleSidebar(){
+  if(isMobileView()){
+    mobilePanels.sidebar = !mobilePanels.sidebar;
+    if(mobilePanels.sidebar) mobilePanels.inspector = false;
+    updateShellLayout();
+    return;
+  }
+  S.uiState.sidebarHidden = !S.uiState.sidebarHidden;
+  updateShellLayout();
+  saveAppStateDebounced();
+}
+function toggleInspector(){
+  if(isMobileView()){
+    mobilePanels.inspector = !mobilePanels.inspector;
+    if(mobilePanels.inspector) mobilePanels.sidebar = false;
+    updateShellLayout();
+    return;
+  }
+  S.uiState.inspectorHidden = !S.uiState.inspectorHidden;
+  updateShellLayout();
+  saveAppStateDebounced();
+}
+
+let resizeDebounce = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeDebounce);
+  resizeDebounce = setTimeout(updateShellLayout, 120);
+});
+
+/* =========================================================================
+   IMAGE LIGHTBOX (click the card artwork to view it large)
+========================================================================= */
+function openImageLightbox(scryfallId, isFoil, alt){
+  if(!scryfallId) return;
+  const overlay = document.getElementById('imgLightboxOverlay');
+  const frame = document.getElementById('imgLightboxFrame');
+  const img = document.getElementById('imgLightboxImg');
+  img.src = scryfallImg(scryfallId, 'large');
+  img.alt = alt || '';
+  frame.classList.toggle('foil', !!isFoil);
+  overlay.classList.add('show');
+}
+function closeImageLightbox(){
+  document.getElementById('imgLightboxOverlay').classList.remove('show');
+}
+
+function downloadJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename.replace(/[^\w.\-]+/g,'_');
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* =========================================================================
+   JSON TREE (DevTools-style, lazy)
+========================================================================= */
+const ARRAY_PAGE = 100;
+
+function renderTree(){
+  const el = document.getElementById('treePane');
+  el.innerHTML = '';
+  el.appendChild(buildTreeNode('data', S.root, 0, true));
+}
+
+function buildTreeNode(key, value, depth, startOpen){
+  const row = document.createElement('div');
+  const type = valueType(value);
+  const rowLine = document.createElement('div');
+  rowLine.className = 'jt-row' + ((type==='object'||type==='array') ? ' clickable' : '');
+
+  let toggle = null;
+  let childrenWrap = null;
+  let expanded = !!startOpen;
+
+  if(type==='object' || type==='array'){
+    toggle = document.createElement('span');
+    toggle.className = 'jt-toggle';
+    toggle.textContent = expanded ? '▾' : '▸';
+    rowLine.appendChild(toggle);
+  } else {
+    const spacer = document.createElement('span'); spacer.className='jt-toggle'; spacer.textContent=''; rowLine.appendChild(spacer);
+  }
+
+  const keySpan = document.createElement('span');
+  keySpan.className = 'jt-key';
+  keySpan.textContent = key;
+  rowLine.appendChild(keySpan);
+
+  const punc = document.createElement('span'); punc.className='jt-punc'; punc.textContent=': ';
+  rowLine.appendChild(punc);
+
+  const summary = document.createElement('span');
+  summary.className = 'jt-type';
+  summary.textContent = summarize(value, type);
+  rowLine.appendChild(summary);
+
+  if(type==='array' && isArrayOfObjects(value)){
+    const loadBtn = document.createElement('span');
+    loadBtn.className = 'jt-load';
+    loadBtn.textContent = 'Usar como tabla';
+    loadBtn.addEventListener('click', (e)=>{ e.stopPropagation(); loadArrayAsAdhocCategory(key, value); });
+    rowLine.appendChild(loadBtn);
+  }
+
+  row.appendChild(rowLine);
+
+  function renderPrimitiveInline(v){
+    if(typeof v==='string') return `<span class="jt-str">"${esc(truncate(v,120))}"</span>`;
+    if(typeof v==='number') return `<span class="jt-num">${v}</span>`;
+    if(typeof v==='boolean') return `<span class="jt-bool">${v}</span>`;
+    if(v===null) return `<span class="jt-null">null</span>`;
+    return esc(String(v));
+  }
+
+  if(type==='object' || type==='array'){
+    childrenWrap = document.createElement('div');
+    childrenWrap.className = 'jt-children';
+    childrenWrap.style.display = expanded ? 'block' : 'none';
+    row.appendChild(childrenWrap);
+
+    let built = false;
+    function buildChildren(){
+      if(built) return; built = true;
+      if(type==='object'){
+        Object.keys(value).forEach(k=>{
+          childrenWrap.appendChild(buildTreeNode(k, value[k], depth+1, false));
+        });
+      } else {
+        const max = Math.min(value.length, ARRAY_PAGE);
+        for(let i=0;i<max;i++){
+          childrenWrap.appendChild(buildTreeNode('['+i+']', value[i], depth+1, false));
+        }
+        if(value.length > ARRAY_PAGE){
+          const more = document.createElement('div');
+          more.className = 'jt-more';
+          more.textContent = `… mostrar ${value.length - max} elementos más`;
+          more.addEventListener('click', ()=>{
+            for(let i=max;i<value.length;i++){
+              childrenWrap.insertBefore(buildTreeNode('['+i+']', value[i], depth+1, false), more);
+            }
+            more.remove();
+          });
+          childrenWrap.appendChild(more);
+        }
+      }
+    }
+    if(expanded) buildChildren();
+
+    rowLine.addEventListener('click', ()=>{
+      expanded = !expanded;
+      toggle.textContent = expanded ? '▾' : '▸';
+      if(expanded){ buildChildren(); childrenWrap.style.display='block'; }
+      else childrenWrap.style.display='none';
+    });
+  } else {
+    summary.innerHTML = renderPrimitiveInline(value);
+  }
+
+  return row;
+}
+
+function valueType(v){
+  if(Array.isArray(v)) return 'array';
+  if(v===null) return 'null';
+  return typeof v;
+}
+function summarize(v, type){
+  if(type==='object') return `{${Object.keys(v).length}}`;
+  if(type==='array') return `[${v.length}]`;
+  return '';
+}
+function truncate(s,n){ return s.length>n ? s.slice(0,n)+'…' : s; }
+
+function loadArrayAsAdhocCategory(key, arr){
+  const kind = looksLikeCard(arr[0]) ? 'cards' : 'generic';
+  S.categories['_adhoc_'+key] = { label: '★ '+titleCase(key), icon:'📌', items:arr, kind };
+  renderNav();
+  selectCategory('_adhoc_'+key);
+  document.querySelector('.sb-tab[data-pane="navPane"]').click();
+}
+
+/* =========================================================================
+   FILE LOADING
+========================================================================= */
+async function handleAutoJsonFile(file){
+  // Los archivos con estructura {collection: ...} son colecciones;
+  // cualquier otro JSON se procesa como MTGJSON normal.
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const json = JSON.parse(text);
+    if(json && isPlainObject(json) && isPlainObject(json.collection)){
+      importCollectionObject(json, file.name);
+      return;
+    }
+  }catch(e){
+    console.warn('No se pudo inspeccionar '+file.name, e);
+  }
+  handleFile(file);
+}
+
+function importCollectionObject(parsed, fileName){
+  const incoming = parsed.collection || {};
+  const incomingKeys = Object.keys(incoming);
+  if(!incomingKeys.length) return;
+  let matched = 0, ignored = 0;
+  incomingKeys.forEach(uuid=>{
+    if(!S.uuidIndex.has(uuid)){ ignored++; return; }
+    matched++;
+    S.collection.set(uuid, incoming[uuid]);
+  });
+  if(parsed.preferences) S.preferences = Object.assign(S.preferences, parsed.preferences);
+  saveCollection();
+  applyImageModeUI();
+  applyFiltersAndRender();
+  console.info(`Colección automática: ${fileName} — ${matched} carta(s) vinculadas, ${ignored} ignoradas.`);
+}
+
+function handleFile(file){
+  if(!file) return;
+  if(!/\.json$/i.test(file.name)){
+    setStatus(file.name+' — no parece un .json', 'err');
+  }
+  setStatus('Leyendo '+file.name+'…', '');
+  const reader = new FileReader();
+  reader.onload = e=>{
+    let json;
+    try{ json = JSON.parse(e.target.result); }
+    catch(err){ setStatus('Error al parsear JSON: '+err.message, 'err'); return; }
+    try{
+      analyze(json);
+    }catch(err){
+      setStatus('No se pudo interpretar la estructura: '+err.message, 'err');
+      console.error(err);
+      return;
+    }
+    S.fileName = file.name;
+    setStatus(file.name, 'ok');
+    variantCache.clear();
+    buildUuidIndex();
+    showApp();
+  };
+  reader.onerror = ()=> setStatus('Error al leer el archivo', 'err');
+  reader.readAsText(file);
+}
+
+function buildUuidIndex(){
+  S.uuidIndex = new Map();
+  Object.values(S.categories).forEach(cat=>{
+    if(cat.kind!=='cards') return;
+    cat.items.forEach(c=>{ if(c.uuid) S.uuidIndex.set(c.uuid, c); });
+  });
+}
+
+function setStatus(text, state){
+  document.getElementById('statusName').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'dot' + (state? ' '+state : '');
+}
+
+function showApp(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('sidebar').style.display='flex';
+  document.getElementById('main').style.display='flex';
+  document.getElementById('inspector').style.display='flex';
+  document.getElementById('inspectorEmpty').style.display='flex';
+  document.getElementById('inspectorBody').style.display='none';
+  renderSetHeader();
+  renderNav();
+  renderTree();
+  buildColumnsMenu();
+  applyImageModeUI();
+
+  const saved = loadAppState();
+  const validSavedCat = saved && saved.activeCategoryKey && S.categories[saved.activeCategoryKey];
+  const firstKey = validSavedCat ? saved.activeCategoryKey : Object.keys(S.categories)[0];
+
+  if(saved){
+    if(saved.searchScope) S.searchScope = saved.searchScope;
+    if(saved.visibleColumns && saved.visibleColumns.length) S.visibleColumns = saved.visibleColumns;
+    if(saved.view) S.collectionView = saved.view;
+    if(saved.uiState) S.uiState = Object.assign(S.uiState, saved.uiState);
+  }
+  updateShellLayout();
+  document.getElementById('searchScope').value = S.searchScope;
+  buildColumnsMenu();
+
+  if(firstKey) selectCategory(firstKey, { skipReset: !!saved });
+
+  if(saved){
+    if(saved.search) document.getElementById('searchBox').value = saved.search;
+    if(saved.sortKey){ S.sortKey = saved.sortKey; S.sortDir = saved.sortDir||1; }
+    setActiveCollectionNav(S.collectionView);
+    applyFiltersAndRender();
+    if(saved.selectedUuid && S.uuidIndex.has(saved.selectedUuid)){
+      selectItem(S.uuidIndex.get(saved.selectedUuid));
+    }
+  }
+}
+
+/* =========================================================================
+   AUTOMATIC JSON LOADING
+   - En navegador/servidor: intenta cargar archivos conocidos de la misma carpeta.
+   - Con file://: el navegador no permite enumerar la carpeta automáticamente;
+     se usa el selector de carpeta como alternativa segura.
+========================================================================= */
+const AUTO_JSON_NAMES = [
+  'TMT.json',
+  'TMT(4).json',
+  '15 DE AGOSTO.json',
+  '15 DE AGOSTO(1).json',
+  'coleccion.json',
+  'collection.json'
+];
+
+async function autoLoadSameDirectory(){
+  if(location.protocol === 'file:'){
+    setStatus('Selecciona la carpeta para cargar los JSON automáticamente', '');
+    return false;
+  }
+
+  let loadedSet = false;
+  let loadedCollection = false;
+  for(const name of AUTO_JSON_NAMES){
+    try{
+      const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
+      if(!response.ok) continue;
+      const json = await response.json();
+      if(json && isPlainObject(json) && isPlainObject(json.collection)){
+        // La colección necesita que el índice de cartas ya exista.
+        if(S.uuidIndex && S.uuidIndex.size){
+          importCollectionObject(json, name);
+          loadedCollection = true;
+        }
+      }else if(!loadedSet){
+        analyze(json);
+        S.fileName = name;
+        variantCache.clear();
+        buildUuidIndex();
+        showApp();
+        loadedSet = true;
+      }
+    }catch(e){
+      // Es normal que no exista alguno de los nombres candidatos.
+    }
+  }
+  if(loadedSet){
+    // La colección puede haberse encontrado después del set. Reintentamos.
+    for(const name of AUTO_JSON_NAMES){
+      try{
+        const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
+        if(!response.ok) continue;
+        const json = await response.json();
+        if(json && isPlainObject(json) && isPlainObject(json.collection)){
+          importCollectionObject(json, name);
+          loadedCollection = true;
+        }
+      }catch(e){}
+    }
+    setStatus(S.fileName + (loadedCollection ? ' · colección vinculada' : ''), 'ok');
+    return true;
+  }
+  return false;
+}
+
+async function openFolderAndLoad(){
+  if(!('showDirectoryPicker' in window)){
+    alert('Tu navegador no permite seleccionar carpetas desde esta página. Usa Chrome o Edge actualizado.');
+    return;
+  }
+  try{
+    const dir = await window.showDirectoryPicker({ mode:'read' });
+    const jsonFiles = [];
+    for await(const entry of dir.values()){
+      if(entry.kind === 'file' && /\.json$/i.test(entry.name)) jsonFiles.push(entry);
+    }
+    if(!jsonFiles.length){
+      alert('No encontré archivos .json en esa carpeta.');
+      return;
+    }
+
+    // Primero cargar el MTGJSON principal para construir uuidIndex.
+    const parsedFiles = [];
+    for(const entry of jsonFiles){
+      try{
+        const file = await entry.getFile();
+        const text = await file.text();
+        parsedFiles.push({ file, json:JSON.parse(text) });
+      }catch(e){ console.warn('JSON omitido:', entry.name, e); }
+    }
+
+    const setFile = parsedFiles.find(x=>!(x.json && isPlainObject(x.json.collection)));
+    if(setFile){
+      analyze(setFile.json);
+      S.fileName = setFile.file.name;
+      variantCache.clear();
+      buildUuidIndex();
+      showApp();
+    }
+
+    const collectionFiles = parsedFiles.filter(x=>x.json && isPlainObject(x.json.collection));
+    collectionFiles.forEach(x=>importCollectionObject(x.json, x.file.name));
+
+    if(setFile){
+      setStatus(S.fileName + (collectionFiles.length ? ' · colección vinculada' : ''), 'ok');
+    }else{
+      alert('Encontré JSON, pero ninguno parece ser un archivo MTGJSON principal.');
+    }
+  }catch(e){
+    if(e && e.name !== 'AbortError') alert('No se pudo leer la carpeta: '+e.message);
+  }
+}
+
+/* =========================================================================
+   WIRE UP UI
+========================================================================= */
+document.querySelectorAll('.sb-tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.sb-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.sb-pane').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.pane).classList.add('active');
+  });
+});
+
+document.getElementById('btnOpen').addEventListener('click', ()=>document.getElementById('fileInput').click());
+document.getElementById('btnOpenFolder').addEventListener('click', openFolderAndLoad);
+document.getElementById('landingDrop').addEventListener('click', ()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
+
+['dragenter','dragover'].forEach(evt=>{
+  window.addEventListener(evt, e=>{ e.preventDefault(); document.getElementById('dropOverlay').classList.add('show'); });
+});
+['dragleave','drop'].forEach(evt=>{
+  window.addEventListener(evt, e=>{
+    e.preventDefault();
+    if(evt==='drop'){
+      document.getElementById('dropOverlay').classList.remove('show');
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f) handleFile(f);
+    } else if(e.target === document.getElementById('dropOverlay') || e.relatedTarget===null){
+      document.getElementById('dropOverlay').classList.remove('show');
+    }
+  });
+});
+document.getElementById('landingDrop').addEventListener('dragover', e=>{ e.stopPropagation(); });
+
+document.getElementById('searchBox').addEventListener('input', debounce(applyFiltersAndRender, 120));
+document.getElementById('filterRarity').addEventListener('change', applyFiltersAndRender);
+document.getElementById('filterColor').addEventListener('change', applyFiltersAndRender);
+document.getElementById('searchScope').addEventListener('change', e=>{
+  S.searchScope = e.target.value;
+  applyFiltersAndRender();
+  saveAppStateDebounced();
+});
+
+document.getElementById('btnColumns').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  document.getElementById('columnsMenu').classList.toggle('show');
+});
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('columnsMenu');
+  if(menu.classList.contains('show') && !menu.contains(e.target) && e.target.id!=='btnColumns'){
+    menu.classList.remove('show');
+  }
+});
+
+document.getElementById('btnExportCollection').addEventListener('click', exportCollection);
+document.getElementById('btnImportCollection').addEventListener('click', ()=>document.getElementById('collectionFileInput').click());
+document.getElementById('collectionFileInput').addEventListener('change', e=>{
+  if(e.target.files[0]) importCollectionFile(e.target.files[0]);
+  e.target.value = '';
+});
+
+document.getElementById('treeExpandAll').addEventListener('click', ()=>{
+  // simple approach: re-render fully open only one level deep to avoid perf issues on huge files
+  document.querySelectorAll('#treePane .jt-toggle').forEach(t=>{ if(t.textContent==='▸') t.parentElement.click(); });
+});
+document.getElementById('treeCollapseAll').addEventListener('click', renderTree);
+
+document.getElementById('btnClearStorage').addEventListener('click', ()=>{
+  if(!confirm('Esto borrará tus preferencias Y tu colección física guardada en este navegador. ¿Continuar?')) return;
+  try{
+    localStorage.removeItem(COLLECTION_STATE_KEY);
+    localStorage.removeItem(COLLECTION_DATA_KEY);
+  }catch(e){}
+  S.collection = new Map();
+  S.preferences = { imageMode:'normal' };
+  applyImageModeUI();
+  if(Object.keys(S.categories).length) applyFiltersAndRender();
+  if(S.selectedItem) selectItem(S.selectedItem);
+  alert('Preferencias y colección locales borradas.');
+});
+
+document.getElementById('cpClose').addEventListener('click', closeCollectionPopover);
+document.getElementById('cpDone').addEventListener('click', closeCollectionPopover);
+document.getElementById('collPopoverOverlay').addEventListener('click', (e)=>{
+  if(e.target.id==='collPopoverOverlay') closeCollectionPopover();
+});
+
+document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
+document.getElementById('btnToggleInspector').addEventListener('click', toggleInspector);
+document.getElementById('panelBackdrop').addEventListener('click', closeMobilePanels);
+document.getElementById('btnCloseSidebarMobile').addEventListener('click', closeMobilePanels);
+document.getElementById('btnCloseInspectorMobile').addEventListener('click', closeMobilePanels);
+document.getElementById('btnFabInspector').addEventListener('click', ()=>{
+  mobilePanels.inspector = true;
+  mobilePanels.sidebar = false;
+  updateShellLayout();
+});
+
+document.getElementById('lightboxClose').addEventListener('click', closeImageLightbox);
+document.getElementById('imgLightboxOverlay').addEventListener('click', (e)=>{
+  if(e.target.id==='imgLightboxOverlay') closeImageLightbox();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    closeImageLightbox();
+    closeCollectionPopover();
+  }
+});
+
+loadCollection();
+
+// Intenta cargar automáticamente los JSON de la misma carpeta cuando la página
+// está servida por HTTP/HTTPS. Con file:// se conserva el selector de carpeta.
+autoLoadSameDirectory().catch(err=>console.warn('Carga automática no disponible:', err));
+
+})();
+</script>
+</body>
+</html>
