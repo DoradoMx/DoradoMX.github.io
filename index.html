@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -146,6 +147,14 @@ input[type=file]{ display:none; }
 
 .nav-group{ padding:8px; }
 .nav-label{ font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:8px 8px 4px; }
+.nav-group-title{
+  display:flex; align-items:center; gap:8px; padding:8px; margin-top:6px; border-radius:6px;
+  font-family:var(--font-display); font-weight:600; font-size:13px; color:var(--text-dim); cursor:pointer;
+  border:1px solid transparent;
+}
+.nav-group-title:hover{ background:var(--panel-alt); color:var(--text); }
+.nav-group-title.active{ color:var(--gold-bright); border-color:var(--border); background:var(--panel-alt); }
+.nav-group-body{ padding-left:4px; margin-bottom:4px; }
 .nav-item{
   display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px; cursor:pointer;
   color:var(--text-dim); font-size:13.5px; margin-bottom:1px;
@@ -520,7 +529,7 @@ pre.rawjson{
     <button class="btn small ghost" id="btnExportCollection" title="Descargar coleccion.json">Guardar colección</button>
     <button class="btn small ghost" id="btnImportCollection" title="Cargar un coleccion.json exportado previamente">Importar colección</button>
     <button class="btn small ghost" id="btnClearStorage" title="Borrar preferencias guardadas en este navegador">Limpiar almacenamiento</button>
-    <button class="btn small ghost panel-toggle-btn" id="btnToggleSidebar" title="Mostrar/ocultar panel izquierdo">◧ Panel izq.</button>
+    <button class="btn small ghost panel-toggle-btn" id="btnToggleSidebar" title="Mostrar/ocultar panel de colecciones">☰</button>
     <button class="btn small ghost panel-toggle-btn" id="btnToggleInspector" title="Mostrar/ocultar panel derecho">▤ Panel der.</button>
   </div>
   <input type="file" id="fileInput" accept=".json,application/json">
@@ -583,8 +592,8 @@ pre.rawjson{
         <div id="columnsMenu"></div>
       </div>
       <div class="view-toggle" id="viewToggle">
-        <button type="button" class="active" data-view="list" title="Vista de lista">☰ Lista</button>
-        <button type="button" data-view="gallery" title="Vista de imágenes">▦ Imágenes</button>
+        <button type="button" data-view="list" title="Vista de lista">☰ Lista</button>
+        <button type="button" class="active" data-view="gallery" title="Vista de imágenes">▦ Imágenes</button>
       </div>
       <span class="count-pill" id="rowCount"></span>
     </div>
@@ -654,8 +663,10 @@ const S = {
   searchScope:'all',          // 'all' | 'name' | 'artist'
   collectionView:'all',       // 'all' | 'have' | 'missing' | 'incomplete'
   visibleColumns:['image','number','rarity','type','manaCost','colors','finishes','promoTypes','collection','have','normal','foil','surge'], // toggleable columns
-  uiState:{ sidebarHidden:false, inspectorHidden:false },
-  viewMode:'list', // 'list' | 'gallery'
+  uiState:{ sidebarHidden:true, inspectorHidden:false },
+  viewMode:'gallery', // 'list' | 'gallery'
+  fileGroups:[],       // multiple loaded set/file groups: [{key,label,mode,setInfo,categories}]
+  activeGroupKey:null,
 };
 
 const COLLECTION_STATE_KEY = 'mtgjson_explorer_state';
@@ -845,6 +856,7 @@ function saveAppState(){
       visibleColumns:S.visibleColumns,
       columnsSchemaVersion:2,
       viewMode:S.viewMode,
+      activeGroupKey:S.activeGroupKey,
       activeCategoryKey:S.activeCategoryKey,
       uiState:S.uiState,
     };
@@ -1021,27 +1033,56 @@ function renderSetHeader(){
   el.innerHTML = `<div class="name">${esc(info.name||'Archivo JSON')}</div><div class="meta">${esc(metaBits.join(' · ') || S.mode)}</div>`;
 }
 
+function collectionNavHtml(groupKey){
+  return `
+    <div class="nav-item" data-collview="all" data-group="${esc(groupKey)}"><span class="ic">🂠</span><span class="lbl">Todas</span></div>
+    <div class="nav-item" data-collview="have" data-group="${esc(groupKey)}"><span class="ic">🟢</span><span class="lbl">Mi colección</span></div>
+    <div class="nav-item" data-collview="missing" data-group="${esc(groupKey)}"><span class="ic">⚪</span><span class="lbl">Me faltan</span></div>
+    <div class="nav-item" data-collview="incomplete" data-group="${esc(groupKey)}"><span class="ic">🟡</span><span class="lbl">Incompletas</span></div>
+  `;
+}
+
 function renderNav(){
   const el = document.getElementById('navGroup');
-  const keys = Object.keys(S.categories);
-  if(!keys.length){ el.innerHTML = '<div class="nav-empty">No se detectaron colecciones reconocibles. Revisa la pestaña «Árbol JSON».</div>'; return; }
-  const collNavHtml = `
-    <div class="nav-label">Mi colección física</div>
-    <div class="nav-item" data-collview="all"><span class="ic">🂠</span><span class="lbl">Todas</span></div>
-    <div class="nav-item" data-collview="have"><span class="ic">🟢</span><span class="lbl">Mi colección</span></div>
-    <div class="nav-item" data-collview="missing"><span class="ic">⚪</span><span class="lbl">Me faltan</span></div>
-    <div class="nav-item" data-collview="incomplete"><span class="ic">🟡</span><span class="lbl">Incompletas</span></div>
-  `;
-  el.innerHTML = collNavHtml + '<div class="nav-label">Colecciones detectadas</div>' + keys.map(k=>{
-    const c = S.categories[k];
-    const n = c.single ? '' : c.items.length;
-    return `<div class="nav-item" data-cat="${esc(k)}"><span class="ic">${c.icon}</span><span class="lbl">${esc(c.label)}</span><span class="cnt">${n}</span></div>`;
-  }).join('');
+  if(!S.fileGroups.length){ el.innerHTML = '<div class="nav-empty">No se detectaron colecciones reconocibles. Revisa la pestaña «Árbol JSON».</div>'; return; }
+
+  if(S.fileGroups.length === 1){
+    const g = S.fileGroups[0];
+    const keys = Object.keys(g.categories);
+    el.innerHTML = '<div class="nav-label">Mi colección física</div>' + collectionNavHtml(g.key) +
+      '<div class="nav-label">Colecciones detectadas</div>' + keys.map(k=>{
+        const c = g.categories[k];
+        const n = c.single ? '' : c.items.length;
+        return `<div class="nav-item" data-cat="${esc(k)}"><span class="ic">${c.icon}</span><span class="lbl">${esc(c.label)}</span><span class="cnt">${n}</span></div>`;
+      }).join('');
+  } else {
+    // Multiple JSON files detected in the same folder — one collapsible
+    // section per file, each with its own "Todas / Mi colección / Me
+    // faltan / Incompletas" sub-nav scoped to that file's cards.
+    el.innerHTML = S.fileGroups.map(g=>{
+      const active = g.key === S.activeGroupKey;
+      return `<div class="nav-group-title ${active?'active':''}" data-group-title="${esc(g.key)}">
+          <span class="ic">🂠</span><span class="lbl">${esc(g.label)}</span>
+        </div>
+        <div class="nav-group-body">${collectionNavHtml(g.key)}</div>`;
+    }).join('');
+  }
+
   el.querySelectorAll('.nav-item[data-cat]').forEach(n=>{
     n.addEventListener('click', ()=> selectCategory(n.dataset.cat));
   });
+  el.querySelectorAll('.nav-group-title').forEach(n=>{
+    n.addEventListener('click', ()=>{
+      const key = n.dataset.groupTitle;
+      if(key !== S.activeGroupKey) activateGroup(key);
+    });
+  });
   el.querySelectorAll('.nav-item[data-collview]').forEach(n=>{
     n.addEventListener('click', ()=>{
+      const groupKey = n.dataset.group;
+      if(groupKey && groupKey !== S.activeGroupKey){
+        activateGroup(groupKey, { skipReset:true });
+      }
       S.collectionView = n.dataset.collview;
       setActiveCollectionNav(S.collectionView);
       applyFiltersAndRender();
@@ -1052,7 +1093,8 @@ function renderNav(){
 }
 function setActiveCollectionNav(view){
   document.querySelectorAll('.nav-item[data-collview]').forEach(n=>{
-    n.classList.toggle('active', n.dataset.collview===view);
+    const matchesGroup = !n.dataset.group || n.dataset.group === S.activeGroupKey;
+    n.classList.toggle('active', matchesGroup && n.dataset.collview===view);
   });
 }
 
@@ -1956,7 +1998,10 @@ function handleFile(file){
     try{ json = JSON.parse(e.target.result); }
     catch(err){ setStatus('Error al parsear JSON: '+err.message, 'err'); return; }
     try{
-      analyze(json);
+      S.fileGroups = [];
+      const group = registerFileGroup(json, file.name);
+      if(!group) throw new Error('No se reconoció como archivo MTGJSON.');
+      S.activeGroupKey = group.key;
     }catch(err){
       setStatus('No se pudo interpretar la estructura: '+err.message, 'err');
       console.error(err);
@@ -1974,10 +2019,48 @@ function handleFile(file){
 
 function buildUuidIndex(){
   S.uuidIndex = new Map();
-  Object.values(S.categories).forEach(cat=>{
-    if(cat.kind!=='cards') return;
-    cat.items.forEach(c=>{ if(c.uuid) S.uuidIndex.set(c.uuid, c); });
+  const sources = S.fileGroups.length ? S.fileGroups.map(g=>g.categories) : [S.categories];
+  sources.forEach(categories=>{
+    Object.values(categories).forEach(cat=>{
+      if(cat.kind!=='cards') return;
+      cat.items.forEach(c=>{ if(c.uuid) S.uuidIndex.set(c.uuid, c); });
+    });
   });
+}
+
+// Derives a short label for a loaded file/set, preferring the set code from
+// the JSON itself (e.g. "TMT") and falling back to the filename.
+function labelForGroup(json, fileName){
+  const root = (json && isPlainObject(json) && 'data' in json) ? json.data : json;
+  if(isPlainObject(root) && root.code) return String(root.code);
+  if(isPlainObject(root) && root.name) return String(root.name);
+  return fileName.replace(/\.json$/i,'');
+}
+
+// Parses one JSON payload as a card-set file and registers/updates it as its
+// own file group. Returns the group, or null if it wasn't recognizable.
+function registerFileGroup(json, fileName){
+  try{ analyze(json); }catch(e){ console.warn('No se pudo interpretar', fileName, e); return null; }
+  if(!Object.keys(S.categories).length) return null;
+  const key = fileName;
+  const group = { key, label: labelForGroup(json, fileName), mode:S.mode, setInfo:S.setInfo, categories:S.categories, raw:json };
+  const idx = S.fileGroups.findIndex(g=>g.key===key);
+  if(idx>=0) S.fileGroups[idx] = group; else S.fileGroups.push(group);
+  return group;
+}
+
+// Makes the given group the one shown in the main table/gallery + inspector.
+function activateGroup(key, opts){
+  const group = S.fileGroups.find(g=>g.key===key);
+  if(!group) return;
+  S.activeGroupKey = key;
+  S.categories = group.categories;
+  S.mode = group.mode;
+  S.setInfo = group.setInfo;
+  const firstCatKey = Object.keys(group.categories)[0];
+  if(firstCatKey) selectCategory(firstCatKey, opts||{});
+  renderSetHeader();
+  renderNav();
 }
 
 function setStatus(text, state){
@@ -2000,6 +2083,11 @@ function showApp(){
   applyImageModeUI();
 
   const saved = loadAppState();
+  if(saved && saved.activeGroupKey && S.fileGroups.some(g=>g.key===saved.activeGroupKey) && saved.activeGroupKey!==S.activeGroupKey){
+    const g = S.fileGroups.find(g=>g.key===saved.activeGroupKey);
+    S.activeGroupKey = g.key; S.categories = g.categories; S.mode = g.mode; S.setInfo = g.setInfo;
+    renderSetHeader(); renderNav();
+  }
   const validSavedCat = saved && saved.activeCategoryKey && S.categories[saved.activeCategoryKey];
   const firstKey = validSavedCat ? saved.activeCategoryKey : Object.keys(S.categories)[0];
 
@@ -2057,45 +2145,35 @@ async function autoLoadSameDirectory(){
     return false;
   }
 
-  let loadedSet = false;
-  let loadedCollection = false;
+  S.fileGroups = [];
+  const collectionPayloads = [];
   for(const name of AUTO_JSON_NAMES){
     try{
       const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
       if(!response.ok) continue;
       const json = await response.json();
       if(json && isPlainObject(json) && isPlainObject(json.collection)){
-        // La colección necesita que el índice de cartas ya exista.
-        if(S.uuidIndex && S.uuidIndex.size){
-          importCollectionObject(json, name);
-          loadedCollection = true;
-        }
-      }else if(!loadedSet){
-        analyze(json);
-        S.fileName = name;
-        variantCache.clear();
-        buildUuidIndex();
-        showApp();
-        loadedSet = true;
+        collectionPayloads.push({ json, name });
+      } else {
+        registerFileGroup(json, name);
       }
     }catch(e){
       // Es normal que no exista alguno de los nombres candidatos.
     }
   }
-  if(loadedSet){
-    // La colección puede haberse encontrado después del set. Reintentamos.
-    for(const name of AUTO_JSON_NAMES){
-      try{
-        const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
-        if(!response.ok) continue;
-        const json = await response.json();
-        if(json && isPlainObject(json) && isPlainObject(json.collection)){
-          importCollectionObject(json, name);
-          loadedCollection = true;
-        }
-      }catch(e){}
-    }
-    setStatus(S.fileName + (loadedCollection ? ' · colección vinculada' : ''), 'ok');
+
+  if(S.fileGroups.length){
+    const first = S.fileGroups[0];
+    S.activeGroupKey = first.key;
+    S.categories = first.categories;
+    S.mode = first.mode;
+    S.setInfo = first.setInfo;
+    S.fileName = S.fileGroups.length>1 ? S.fileGroups.map(g=>g.label).join(', ') : first.key;
+    variantCache.clear();
+    buildUuidIndex();
+    showApp();
+    collectionPayloads.forEach(({json,name})=> importCollectionObject(json, name));
+    setStatus(S.fileName + (collectionPayloads.length ? ' · colección vinculada' : ''), 'ok');
     return true;
   }
   return false;
@@ -2117,7 +2195,8 @@ async function openFolderAndLoad(){
       return;
     }
 
-    // Primero cargar el MTGJSON principal para construir uuidIndex.
+    // Separa los archivos de colección (traen la clave "collection") del
+    // resto, que intentamos registrar como sets/archivos MTGJSON propios.
     const parsedFiles = [];
     for(const entry of jsonFiles){
       try{
@@ -2126,20 +2205,30 @@ async function openFolderAndLoad(){
         parsedFiles.push({ file, json:JSON.parse(text) });
       }catch(e){ console.warn('JSON omitido:', entry.name, e); }
     }
+    const collectionFiles = parsedFiles.filter(x=>x.json && isPlainObject(x.json.collection));
+    const candidateSetFiles = parsedFiles.filter(x=>!(x.json && isPlainObject(x.json.collection)));
 
-    const setFile = parsedFiles.find(x=>!(x.json && isPlainObject(x.json.collection)));
-    if(setFile){
-      analyze(setFile.json);
-      S.fileName = setFile.file.name;
+    S.fileGroups = [];
+    candidateSetFiles.forEach(x=>{
+      try{ registerFileGroup(x.json, x.file.name); }
+      catch(e){ console.warn('No se reconoció como MTGJSON:', x.file.name, e); }
+    });
+
+    if(S.fileGroups.length){
+      const first = S.fileGroups[0];
+      S.activeGroupKey = first.key;
+      S.categories = first.categories;
+      S.mode = first.mode;
+      S.setInfo = first.setInfo;
+      S.fileName = S.fileGroups.length>1 ? S.fileGroups.map(g=>g.label).join(', ') : first.key;
       variantCache.clear();
       buildUuidIndex();
       showApp();
     }
 
-    const collectionFiles = parsedFiles.filter(x=>x.json && isPlainObject(x.json.collection));
     collectionFiles.forEach(x=>importCollectionObject(x.json, x.file.name));
 
-    if(setFile){
+    if(S.fileGroups.length){
       setStatus(S.fileName + (collectionFiles.length ? ' · colección vinculada' : ''), 'ok');
     }else{
       alert('Encontré JSON, pero ninguno parece ser un archivo MTGJSON principal.');
