@@ -2057,7 +2057,10 @@ function activateGroup(key, opts){
   S.categories = group.categories;
   S.mode = group.mode;
   S.setInfo = group.setInfo;
-  const firstCatKey = Object.keys(group.categories)[0];
+  // Prefer the "cards" category explicitly — a set's own key order (e.g.
+  // TMT.json listing "booster" before "cards") shouldn't decide what's
+  // shown by default.
+  const firstCatKey = group.categories.cards ? 'cards' : Object.keys(group.categories)[0];
   if(firstCatKey) selectCategory(firstCatKey, opts||{});
   renderSetHeader();
   renderNav();
@@ -2089,7 +2092,7 @@ function showApp(){
     renderSetHeader(); renderNav();
   }
   const validSavedCat = saved && saved.activeCategoryKey && S.categories[saved.activeCategoryKey];
-  const firstKey = validSavedCat ? saved.activeCategoryKey : Object.keys(S.categories)[0];
+  const firstKey = validSavedCat ? saved.activeCategoryKey : (S.categories.cards ? 'cards' : Object.keys(S.categories)[0]);
 
   if(saved){
     if(saved.searchScope) S.searchScope = saved.searchScope;
