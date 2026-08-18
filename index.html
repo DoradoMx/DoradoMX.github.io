@@ -301,7 +301,7 @@ pre.rawjson{
 #columnsMenu{
   position:absolute; top:calc(100% + 6px); right:0; z-index:40; display:none;
   background:var(--panel-raised); border:1px solid var(--border); border-radius:8px;
-  padding:8px; min-width:210px; box-shadow:0 10px 30px rgba(0,0,0,.4);
+  padding:8px; min-width:240px; max-height:70vh; overflow-y:auto; box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 #columnsMenu.show{ display:block; }
 #columnsMenu label{
@@ -310,7 +310,41 @@ pre.rawjson{
 }
 #columnsMenu label:hover{ background:var(--panel-alt); color:var(--text); }
 #columnsMenu label input{ accent-color:var(--gold); }
-#columnsMenu .cm-title{ font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:4px 6px 6px; }
+#columnsMenu .cm-title{ font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:8px 6px 6px; }
+#columnsMenu .cm-title:first-of-type{ padding-top:4px; }
+.cm-presets{ display:flex; flex-direction:column; gap:5px; padding-bottom:8px; margin-bottom:6px; border-bottom:1px solid var(--border-soft); }
+.cm-presets .btn{ width:100%; justify-content:center; }
+
+.row-thumb{ width:34px; height:auto; aspect-ratio:5/7; object-fit:cover; border-radius:4px; border:1px solid var(--border); display:block; }
+
+.view-toggle{ display:flex; border:1px solid var(--border); border-radius:7px; overflow:hidden; flex:0 0 auto; }
+.view-toggle button{
+  background:var(--panel-alt); color:var(--text-dim); border:none; padding:7px 12px; font-size:12px;
+  cursor:pointer; font-family:inherit;
+}
+.view-toggle button+button{ border-left:1px solid var(--border); }
+.view-toggle button.active{ background:var(--gold); color:#1a1408; font-weight:600; }
+.view-toggle button:hover:not(.active){ background:var(--panel-raised); color:var(--text); }
+
+.gallery-wrap{ flex:1; overflow:auto; min-height:0; padding:14px; }
+.gallery-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px;
+}
+.gallery-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  cursor:pointer; transition:border-color .15s ease, transform .15s ease; display:flex; flex-direction:column;
+}
+.gallery-card:hover{ border-color:var(--gold); transform:translateY(-2px); }
+.gallery-card .gc-img{ width:100%; aspect-ratio:5/7; background:var(--panel-alt); display:flex; align-items:center; justify-content:center; }
+.gallery-card .gc-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-card .gc-img .noimg{ font-size:11px; color:var(--text-faint); text-align:center; padding:8px; }
+.gallery-card .gc-body{ padding:8px 10px 10px; display:flex; flex-direction:column; gap:4px; flex:1; }
+.gallery-card .gc-name{ font-size:12.5px; font-weight:600; color:var(--text); line-height:1.25; }
+.gallery-card .gc-type{ font-size:10.5px; color:var(--text-faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gallery-card .gc-meta{ display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:4px; }
+.gallery-card .gc-coll{ font-size:11px; font-family:var(--font-mono); color:var(--text-dim); }
+.gallery-card .gc-coll.have{ color:var(--gold-bright); }
+.gallery-card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
 
 /* Popover editor */
 #collPopoverOverlay{
@@ -440,7 +474,8 @@ pre.rawjson{
   .hbtns::-webkit-scrollbar{ display:none; }
   .btn.small{ flex:0 0 auto; }
 
-  .shell{ display:block; overflow:visible; position:relative; }
+  .shell{ display:block; overflow:visible; position:relative; height:100%; }
+  #main{ height:100%; }
   #landing{ display:flex; padding:24px 16px; }
   #main{ width:100%; border-right:none; }
 
@@ -547,6 +582,10 @@ pre.rawjson{
         <button class="btn small ghost" id="btnColumns">Columnas ▾</button>
         <div id="columnsMenu"></div>
       </div>
+      <div class="view-toggle" id="viewToggle">
+        <button type="button" class="active" data-view="list" title="Vista de lista">☰ Lista</button>
+        <button type="button" data-view="gallery" title="Vista de imágenes">▦ Imágenes</button>
+      </div>
       <span class="count-pill" id="rowCount"></span>
     </div>
     <div class="table-wrap" id="tableWrap"></div>
@@ -614,8 +653,9 @@ const S = {
   preferences:{ imageMode:'normal' },
   searchScope:'all',          // 'all' | 'name' | 'artist'
   collectionView:'all',       // 'all' | 'have' | 'missing' | 'incomplete'
-  visibleColumns:['collection','have','normal','foil','surge'], // toggleable extra columns
+  visibleColumns:['image','number','rarity','type','manaCost','colors','finishes','promoTypes','collection','have','normal','foil','surge'], // toggleable columns
   uiState:{ sidebarHidden:false, inspectorHidden:false },
+  viewMode:'list', // 'list' | 'gallery'
 };
 
 const COLLECTION_STATE_KEY = 'mtgjson_explorer_state';
@@ -632,15 +672,27 @@ const SPECIAL_FOIL_PROMO_MAP = {
   gilded:'Gilded Foil', halofoil:'Halo Foil', invisibleink:'Invisible Ink Foil'
 };
 const EXTRA_COLUMN_DEFS = [
-  { key:'collection', label:'Colección' },
-  { key:'have',        label:'Tengo' },
-  { key:'normal',       label:'Normal' },
-  { key:'foil',         label:'Foil' },
-  { key:'surge',        label:'Surge' },
-  { key:'obtained',     label:'Variantes obtenidas' },
-  { key:'existing',     label:'Variantes existentes' },
-  { key:'complete',     label:'Completada' },
+  { key:'image',        label:'Imagen',    group:'Carta' },
+  { key:'number',        label:'#',         group:'Carta' },
+  { key:'rarity',        label:'Rareza',    group:'Carta' },
+  { key:'type',          label:'Tipo',      group:'Carta' },
+  { key:'manaCost',       label:'Coste',     group:'Carta' },
+  { key:'colors',         label:'Colores',   group:'Carta' },
+  { key:'finishes',       label:'Foil',      group:'Carta' },
+  { key:'promoTypes',     label:'Promo',     group:'Carta' },
+  { key:'collection', label:'Colección',              group:'Mi colección' },
+  { key:'have',        label:'Tengo',                    group:'Mi colección' },
+  { key:'normal',       label:'Normal (cant.)',           group:'Mi colección' },
+  { key:'foil',         label:'Foil (cant.)',             group:'Mi colección' },
+  { key:'surge',        label:'Surge (cant.)',            group:'Mi colección' },
+  { key:'obtained',     label:'Variantes obtenidas',      group:'Mi colección' },
+  { key:'existing',     label:'Variantes existentes',     group:'Mi colección' },
+  { key:'complete',     label:'Completada',               group:'Mi colección' },
 ];
+// Presets available from the column menu.
+const COLUMN_PRESET_ALL = EXTRA_COLUMN_DEFS.map(c=>c.key);
+const COLUMN_PRESET_MINIMAL = ['image'];
+const COLUMN_PRESET_DEFAULT = ['image','number','rarity','type','manaCost','colors','finishes','promoTypes','collection','have','normal','foil','surge'];
 
 const CARD_LIKE_KEYS = ['manaCost','type','rarity','colorIdentity','convertedManaCost','manaValue'];
 const CATEGORY_DEFS = [
@@ -791,6 +843,8 @@ function saveAppState(){
       selectedUuid:S.selectedItem ? S.selectedItem.uuid : null,
       sortKey:S.sortKey, sortDir:S.sortDir,
       visibleColumns:S.visibleColumns,
+      columnsSchemaVersion:2,
+      viewMode:S.viewMode,
       activeCategoryKey:S.activeCategoryKey,
       uiState:S.uiState,
     };
@@ -1024,15 +1078,11 @@ function selectCategory(key, opts){
 /* =========================================================================
    TABLE
 ========================================================================= */
+// "Nombre" is the only mandatory column — everything else (including the
+// image thumbnail and the previously-fixed card-info columns) can be
+// hidden via the Columnas menu.
 const CARD_COLUMNS = [
-  { key:'number', label:'#' },
   { key:'name', label:'Nombre' },
-  { key:'rarity', label:'Rareza' },
-  { key:'type', label:'Tipo' },
-  { key:'manaCost', label:'Coste' },
-  { key:'colors', label:'Colores' },
-  { key:'finishes', label:'Foil' },
-  { key:'promoTypes', label:'Promo' },
 ];
 
 function buildFilters(cat){
@@ -1040,13 +1090,15 @@ function buildFilters(cat){
   const cSel = document.getElementById('filterColor');
   const colWrap = document.getElementById('colBtnWrap');
   const scopeSel = document.getElementById('searchScope');
+  const viewToggle = document.getElementById('viewToggle');
   if(cat.kind !== 'cards'){
     rSel.style.display='none'; cSel.style.display='none';
     colWrap.style.display='none'; scopeSel.style.display='none';
+    viewToggle.style.display='none';
     return;
   }
   rSel.style.display=''; cSel.style.display='';
-  colWrap.style.display=''; scopeSel.style.display='';
+  colWrap.style.display=''; scopeSel.style.display=''; viewToggle.style.display='';
   const rarities = Array.from(new Set(cat.items.map(c=>c.rarity).filter(Boolean))).sort();
   rSel.innerHTML = '<option value="">Rareza: todas</option>' + rarities.map(r=>`<option value="${esc(r)}">${esc(titleCase(r))}</option>`).join('');
   const colorSet = new Set();
@@ -1142,8 +1194,29 @@ function renderTable(cat, list){
     wrap.innerHTML = `<div class="empty-state"><div class="big">Sin resultados</div>Ajusta la búsqueda o los filtros.</div>`;
     return;
   }
+  if(cat.kind==='cards' && S.viewMode==='gallery'){ renderCardGallery(wrap, list); return; }
   if(cat.kind==='cards'){ renderCardTable(wrap, list); return; }
   renderGenericTable(wrap, list);
+}
+
+function renderCardGallery(wrap, list){
+  wrap.innerHTML = `<div class="gallery-wrap"><div class="gallery-grid">${list.map((card,i)=>{
+    const thumb = card.identifiers && card.identifiers.scryfallId ? scryfallImg(card.identifiers.scryfallId, 'normal') : null;
+    const counts = collectionCounts(card);
+    const status = collectionStatus(card);
+    return `<div class="gallery-card" data-idx="${i}" data-uuid="${esc(card.uuid||'')}">
+      <div class="gc-img">${thumb ? `<img src="${esc(thumb)}" alt="${esc(card.name||'')}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=noimg>Sin imagen</span>'">` : '<span class="noimg">Sin imagen</span>'}</div>
+      <div class="gc-body">
+        <div class="gc-name">${esc(card.name||'')}</div>
+        <div class="gc-type">${esc(card.type || (card.types?card.types.join(' '):''))}</div>
+        <div class="gc-meta">
+          <span class="pill ${esc(card.rarity||'')}">${esc(card.rarity||'')}</span>
+          <span class="gc-coll ${status!=='none'?'have':''}">${counts.have}/${counts.total}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div></div>`;
+  attachTableEvents(wrap, list, '.gallery-card');
 }
 
 function activeExtraColumns(){
@@ -1154,17 +1227,8 @@ function renderCardTable(wrap, list){
   const extraCols = activeExtraColumns();
   const thead = `<thead><tr>${CARD_COLUMNS.map(c=>`<th data-key="${c.key}">${esc(c.label)}${sortArrow(c.key)}</th>`).join('')}${extraCols.map(c=>`<th data-key="${c.key}" class="mono">${esc(c.label)}${sortArrow(c.key)}</th>`).join('')}</tr></thead>`;
   const rows = list.map((card, i)=>{
-    const foil = (card.finishes||[]).includes('foil') ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
-    const promo = (card.promoTypes && card.promoTypes.length) ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
     return `<tr data-idx="${i}" data-uuid="${esc(card.uuid||'')}">
-      <td class="mono">${esc(card.number ?? '')}</td>
       <td>${esc(card.name || '')}</td>
-      <td><span class="pill ${esc(card.rarity||'')}">${esc(card.rarity||'')}</span></td>
-      <td class="dim">${esc(card.type || (card.types? card.types.join(' '):''))}</td>
-      <td class="mono">${esc(card.manaCost || '')}</td>
-      <td>${manaPips(card.colors)}</td>
-      <td>${foil}</td>
-      <td>${promo}</td>
       ${extraCols.map(c=>`<td data-colcell="${c.key}">${renderExtraCell(c.key, card)}</td>`).join('')}
     </tr>`;
   }).join('');
@@ -1184,6 +1248,19 @@ function renderExtraCell(key, card){
   const variants = cardVariants(card);
   const status = collectionStatus(card);
   switch(key){
+    case 'image':{
+      const thumb = card.identifiers && card.identifiers.scryfallId ? scryfallImg(card.identifiers.scryfallId, 'small') : null;
+      return thumb
+        ? `<img class="row-thumb" src="${esc(thumb)}" alt="${esc(card.name||'')}" loading="lazy" onerror="this.style.display='none'">`
+        : `<span class="dim">—</span>`;
+    }
+    case 'number': return `<span class="mono">${esc(card.number ?? '')}</span>`;
+    case 'rarity': return `<span class="pill ${esc(card.rarity||'')}">${esc(card.rarity||'')}</span>`;
+    case 'type': return `<span class="dim">${esc(card.type || (card.types? card.types.join(' '):''))}</span>`;
+    case 'manaCost': return `<span class="mono">${esc(card.manaCost || '')}</span>`;
+    case 'colors': return manaPips(card.colors);
+    case 'finishes': return (card.finishes||[]).includes('foil') ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
+    case 'promoTypes': return (card.promoTypes && card.promoTypes.length) ? '<span class="check">✔</span>' : '<span class="dim">—</span>';
     case 'collection':{
       const dotClass = status==='complete'?'complete':status==='partial'?'partial':'none';
       const dotChar = status==='complete'?'🟢':status==='partial'?'🟡':'⚪';
@@ -1277,14 +1354,40 @@ function buildColumnsMenu(){
   // Only offer variant columns that actually occur somewhere in this file.
   const existingVariantKeys = new Set();
   cat.items.forEach(c=> cardVariants(c).forEach(v=>existingVariantKeys.add(v.key)));
-  menu.innerHTML = '<div class="cm-title">Mostrar columnas</div>' + EXTRA_COLUMN_DEFS.map(c=>{
-    let disabled = false;
-    if(c.key==='normal' && !existingVariantKeys.has('normal')) disabled = true;
-    if(c.key==='foil' && !existingVariantKeys.has('foil')) disabled = true;
-    if(c.key==='surge' && !existingVariantKeys.has('surgefoil')) disabled = true;
-    const checked = S.visibleColumns.includes(c.key);
-    return `<label><input type="checkbox" data-colkey="${c.key}" ${checked?'checked':''} ${disabled?'disabled':''}> ${esc(c.label)}</label>`;
+
+  const groups = {};
+  EXTRA_COLUMN_DEFS.forEach(c=>{ (groups[c.group] = groups[c.group]||[]).push(c); });
+
+  const groupsHtml = Object.entries(groups).map(([groupName, cols])=>{
+    const items = cols.map(c=>{
+      let disabled = false;
+      if(c.key==='normal' && !existingVariantKeys.has('normal')) disabled = true;
+      if(c.key==='foil' && !existingVariantKeys.has('foil')) disabled = true;
+      if(c.key==='surge' && !existingVariantKeys.has('surgefoil')) disabled = true;
+      const checked = S.visibleColumns.includes(c.key);
+      return `<label><input type="checkbox" data-colkey="${c.key}" ${checked?'checked':''} ${disabled?'disabled':''}> ${esc(c.label)}</label>`;
+    }).join('');
+    return `<div class="cm-title">${esc(groupName)}</div>${items}`;
   }).join('');
+
+  menu.innerHTML = `
+    <div class="cm-presets">
+      <button type="button" class="btn small" id="cmPresetMinimal">Solo nombre + imagen</button>
+      <button type="button" class="btn small" id="cmPresetDefault">Predeterminado</button>
+      <button type="button" class="btn small" id="cmPresetAll">Mostrar todo</button>
+    </div>
+    ${groupsHtml}`;
+
+  const applyPreset = (keys)=>{
+    S.visibleColumns = keys.slice();
+    applyFiltersAndRender();
+    saveAppStateDebounced();
+    buildColumnsMenu();
+  };
+  document.getElementById('cmPresetMinimal').addEventListener('click', ()=>applyPreset(COLUMN_PRESET_MINIMAL));
+  document.getElementById('cmPresetDefault').addEventListener('click', ()=>applyPreset(COLUMN_PRESET_DEFAULT));
+  document.getElementById('cmPresetAll').addEventListener('click', ()=>applyPreset(COLUMN_PRESET_ALL));
+
   menu.querySelectorAll('input[data-colkey]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
       const key = inp.dataset.colkey;
@@ -1301,7 +1404,8 @@ function sortArrow(key){
   return `<span class="arrow">${S.sortDir===1?'▲':'▼'}</span>`;
 }
 
-function attachTableEvents(wrap, list){
+function attachTableEvents(wrap, list, rowSelector){
+  rowSelector = rowSelector || 'tbody tr';
   wrap.querySelectorAll('th[data-key]').forEach(th=>{
     th.addEventListener('click', ()=>{
       const key = th.dataset.key;
@@ -1309,9 +1413,9 @@ function attachTableEvents(wrap, list){
       applyFiltersAndRender();
     });
   });
-  wrap.querySelectorAll('tbody tr').forEach(tr=>{
+  wrap.querySelectorAll(rowSelector).forEach(tr=>{
     tr.addEventListener('click', ()=>{
-      wrap.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));
+      wrap.querySelectorAll(rowSelector).forEach(r=>r.classList.remove('selected'));
       tr.classList.add('selected');
       const idx = parseInt(tr.dataset.idx,10);
       selectItem(list[idx]);
@@ -1901,13 +2005,23 @@ function showApp(){
 
   if(saved){
     if(saved.searchScope) S.searchScope = saved.searchScope;
-    if(saved.visibleColumns && saved.visibleColumns.length) S.visibleColumns = saved.visibleColumns;
+    if(saved.visibleColumns && saved.visibleColumns.length){
+      // Columns schema v2 added the base card-info columns (and the new
+      // image thumbnail) as individually toggleable. Older saved states
+      // only stored the "extra" collection columns, so merge in the base
+      // ones once to preserve the previous always-shown behavior.
+      S.visibleColumns = saved.columnsSchemaVersion===2
+        ? saved.visibleColumns
+        : Array.from(new Set(['image','number','rarity','type','manaCost','colors','finishes','promoTypes', ...saved.visibleColumns]));
+    }
     if(saved.view) S.collectionView = saved.view;
+    if(saved.viewMode==='list' || saved.viewMode==='gallery') S.viewMode = saved.viewMode;
     if(saved.uiState) S.uiState = Object.assign(S.uiState, saved.uiState);
   }
   updateShellLayout();
   document.getElementById('searchScope').value = S.searchScope;
   buildColumnsMenu();
+  document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.toggle('active', b.dataset.view===S.viewMode));
 
   if(firstKey) selectCategory(firstKey, { skipReset: !!saved });
 
@@ -2087,6 +2201,15 @@ document.addEventListener('click', (e)=>{
   if(menu.classList.contains('show') && !menu.contains(e.target) && e.target.id!=='btnColumns'){
     menu.classList.remove('show');
   }
+});
+
+document.querySelectorAll('#viewToggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    S.viewMode = btn.dataset.view;
+    document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.toggle('active', b===btn));
+    applyFiltersAndRender();
+    saveAppStateDebounced();
+  });
 });
 
 document.getElementById('btnExportCollection').addEventListener('click', exportCollection);
