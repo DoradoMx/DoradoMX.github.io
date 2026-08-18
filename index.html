@@ -526,8 +526,8 @@ pre.rawjson{
   <div class="hbtns">
     <button class="btn small" id="btnOpen">Abrir JSON…</button>
     <button class="btn small ghost" id="btnOpenFolder" title="Detectar automáticamente los JSON de la misma carpeta">Abrir carpeta</button>
-    <button class="btn small ghost" id="btnExportCollection" title="Descargar coleccion.json">Guardar colección</button>
-    <button class="btn small ghost" id="btnImportCollection" title="Cargar un coleccion.json exportado previamente">Importar colección</button>
+    <button class="btn small ghost" id="btnExportCollection" title="Descargar SaveData.json">Guardar colección</button>
+    <button class="btn small ghost" id="btnImportCollection" title="Cargar un SaveData.json exportado previamente">Importar colección</button>
     <button class="btn small ghost" id="btnClearStorage" title="Borrar preferencias guardadas en este navegador">Limpiar almacenamiento</button>
     <button class="btn small ghost panel-toggle-btn" id="btnToggleSidebar" title="Mostrar/ocultar panel de colecciones">☰</button>
     <button class="btn small ghost panel-toggle-btn" id="btnToggleInspector" title="Mostrar/ocultar panel derecho">▤ Panel der.</button>
@@ -877,7 +877,7 @@ function exportCollection(){
   const obj = {};
   S.collection.forEach((v,k)=>{ obj[k]=v; });
   const payload = { version:1, collection:obj, preferences:S.preferences };
-  downloadJSON(payload, 'coleccion.json');
+  downloadJSON(payload, 'SaveData.json');
 }
 function importCollectionFile(file){
   const reader = new FileReader();
@@ -2129,15 +2129,33 @@ function showApp(){
    - En navegador/servidor: intenta cargar archivos conocidos de la misma carpeta.
    - Con file://: el navegador no permite enumerar la carpeta automáticamente;
      se usa el selector de carpeta como alternativa segura.
+
+   SaveData.json es siempre el archivo de datos guardados (colección) — se
+   intenta cargar primero y con prioridad, sin necesidad de adivinar nombres.
+
+   Para los sets (TMT, TMC, PZA, y cualquiera que agregues después), un sitio
+   estático como GitHub Pages no puede "listar" la carpeta por sí solo, así
+   que primero se busca un manifiesto opcional (sets.json) con la lista de
+   archivos — si lo mantienes actualizado, cualquier set nuevo se detecta
+   automáticamente sin tocar el código. Si no existe ese manifiesto, se cae
+   de vuelta a una lista de nombres conocidos como respaldo.
 ========================================================================= */
-const AUTO_JSON_NAMES = [
-  'TMT.json',
-  'TMT(4).json',
-  '15 DE AGOSTO.json',
-  '15 DE AGOSTO(1).json',
-  'coleccion.json',
-  'collection.json'
-];
+const SAVE_DATA_NAME = 'SaveData.json';
+const SETS_MANIFEST_NAME = 'sets.json';
+// Nombres de colección antiguos, por compatibilidad con guardados previos.
+const LEGACY_SAVE_NAMES = ['coleccion.json', 'collection.json', '15 DE AGOSTO.json', '15 DE AGOSTO(1).json'];
+// Respaldo si no existe sets.json — edítalo o mejor aún, crea sets.json.
+const AUTO_SET_NAME_GUESSES = ['TMT.json', 'TMC.json', 'PZA.json'];
+
+async function fetchJsonIfExists(name){
+  try{
+    const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
+    if(!response.ok) return null;
+    return await response.json();
+  }catch(e){
+    return null; // es normal que no exista alguno de los nombres candidatos
+  }
+}
 
 async function autoLoadSameDirectory(){
   if(location.protocol === 'file:'){
@@ -2147,18 +2165,30 @@ async function autoLoadSameDirectory(){
 
   S.fileGroups = [];
   const collectionPayloads = [];
-  for(const name of AUTO_JSON_NAMES){
-    try{
-      const response = await fetch('./'+encodeURIComponent(name), { cache:'no-store' });
-      if(!response.ok) continue;
-      const json = await response.json();
-      if(json && isPlainObject(json) && isPlainObject(json.collection)){
-        collectionPayloads.push({ json, name });
-      } else {
-        registerFileGroup(json, name);
-      }
-    }catch(e){
-      // Es normal que no exista alguno de los nombres candidatos.
+
+  // 1. ¿Qué archivos de set intentamos? Preferimos el manifiesto sets.json;
+  //    si no existe, usamos la lista de respaldo.
+  let setNames = AUTO_SET_NAME_GUESSES;
+  const manifest = await fetchJsonIfExists(SETS_MANIFEST_NAME);
+  if(Array.isArray(manifest) && manifest.length && manifest.every(n=>typeof n==='string')){
+    setNames = manifest;
+  }
+  for(const name of setNames){
+    const json = await fetchJsonIfExists(name);
+    if(!json) continue;
+    if(isPlainObject(json) && isPlainObject(json.collection)){
+      collectionPayloads.push({ json, name }); // por si alguien lo lista aquí por error
+    } else {
+      registerFileGroup(json, name);
+    }
+  }
+
+  // 2. SaveData.json siempre es la colección — se busca con prioridad, más
+  //    los nombres antiguos por compatibilidad hacia atrás.
+  for(const name of [SAVE_DATA_NAME, ...LEGACY_SAVE_NAMES]){
+    const json = await fetchJsonIfExists(name);
+    if(json && isPlainObject(json) && isPlainObject(json.collection)){
+      collectionPayloads.push({ json, name });
     }
   }
 
