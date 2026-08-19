@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,18 +11,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#12141a;
-  --panel:#191c24;
-  --panel-alt:#20242e;
-  --panel-raised:#262b37;
-  --border:#2b303c;
-  --border-soft:#22262f;
-  --text:#ecedf0;
-  --text-dim:#8a93a6;
-  --text-faint:#5c6470;
-  --gold:#cda349;
-  --gold-bright:#e8c878;
-  --danger:#e0562d;
+  --bg:#0B0F0D;
+  --panel:#151A17;
+  --panel-alt:#1C211D;
+  --panel-raised:#232A24;
+  --border:#343B32;
+  --border-soft:#262C24;
+  --text:#E8E5D9;
+  --text-dim:#9A9F94;
+  --text-faint:#6E7369;
+  --gold:#D6AA45;
+  --gold-bright:#EAC876;
+  --green:#5B8C3A;
+  --green-bright:#7EAE4B;
+  --danger:#C45A35;
   --w:#f0e6c8; --u:#4fa3e8; --b:#b9b4c4; --r:#e0562d; --g:#5fb562;
   --common:#ecedf0; --uncommon:#b9c9d4; --rare:#d4a84b; --mythic:#ff6a3d; --special:#c88fe0; --bonus:#c88fe0;
   --radius:8px;
@@ -137,7 +140,7 @@ input[type=file]{ display:none; }
   color:var(--text-faint); cursor:pointer; border-bottom:2px solid transparent; font-weight:600;
 }
 .sb-tab:hover{ color:var(--text-dim); }
-.sb-tab.active{ color:var(--gold-bright); border-bottom-color:var(--gold); }
+.sb-tab.active{ color:var(--green-bright); border-bottom-color:var(--green); }
 .sb-pane{ display:none; flex:1; min-height:0; overflow-y:auto; }
 .sb-pane.active{ display:flex; flex-direction:column; }
 
@@ -153,14 +156,14 @@ input[type=file]{ display:none; }
   border:1px solid transparent;
 }
 .nav-group-title:hover{ background:var(--panel-alt); color:var(--text); }
-.nav-group-title.active{ color:var(--gold-bright); border-color:var(--border); background:var(--panel-alt); }
+.nav-group-title.active{ color:var(--green-bright); border-color:var(--border); background:var(--panel-alt); }
 .nav-group-body{ padding-left:4px; margin-bottom:4px; }
 .nav-item{
   display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px; cursor:pointer;
   color:var(--text-dim); font-size:13.5px; margin-bottom:1px;
 }
 .nav-item:hover{ background:var(--panel-alt); color:var(--text); }
-.nav-item.active{ background:var(--panel-raised); color:var(--gold-bright); }
+.nav-item.active{ background:var(--panel-raised); color:var(--green-bright); }
 .nav-item .ic{ width:15px; text-align:center; opacity:.85; flex:0 0 auto; }
 .nav-item .lbl{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .nav-item .cnt{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); }
@@ -277,7 +280,7 @@ tbody tr.selected{ background:#2a2411; box-shadow:inset 2px 0 0 var(--gold); }
   border-bottom:2px solid transparent; font-weight:600;
 }
 .tab-btn:hover{ color:var(--text-dim); }
-.tab-btn.active{ color:var(--gold-bright); border-bottom-color:var(--gold); }
+.tab-btn.active{ color:var(--green-bright); border-bottom-color:var(--green); }
 .tab-panel{ display:none; padding:14px 16px; font-size:12.5px; }
 .tab-panel.active{ display:block; }
 .field-row{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid var(--border-soft); }
@@ -332,7 +335,7 @@ pre.rawjson{
   cursor:pointer; font-family:inherit;
 }
 .view-toggle button+button{ border-left:1px solid var(--border); }
-.view-toggle button.active{ background:var(--gold); color:#1a1408; font-weight:600; }
+.view-toggle button.active{ background:var(--green); color:#0B0F0D; font-weight:600; }
 .view-toggle button:hover:not(.active){ background:var(--panel-raised); color:var(--text); }
 
 .gallery-wrap{ flex:1; overflow:auto; min-height:0; padding:14px; }
@@ -409,7 +412,7 @@ pre.rawjson{
   flex:1; background:var(--panel-raised); color:var(--text-dim); border:1px solid var(--border);
   padding:6px 8px; border-radius:6px; cursor:pointer; font-size:11.5px; font-weight:600;
 }
-.imgmode-toggle button.active{ background:var(--gold); color:#1a1408; border-color:var(--gold); }
+.imgmode-toggle button.active{ background:var(--green); color:#0B0F0D; border-color:var(--green); }
 .imgmode-toggle button:disabled{ opacity:.35; cursor:not-allowed; }
 
 .insp-mycoll{ padding:12px 16px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -422,7 +425,7 @@ pre.rawjson{
 .searchscope{ background:var(--panel-alt); border:1px solid var(--border); color:var(--text-dim); padding:7px 8px; border-radius:7px; font-size:12px; }
 
 /* ---------- PANEL TOGGLES ---------- */
-.panel-toggle-btn.active{ border-color:var(--gold); color:var(--gold-bright); }
+.panel-toggle-btn.active{ border-color:var(--green); color:var(--green-bright); }
 
 /* ---------- IMAGE LIGHTBOX (click card to enlarge) ---------- */
 .card-frame{ cursor:zoom-in; }
@@ -524,15 +527,12 @@ pre.rawjson{
   <div class="brand"><span class="mark">COWABUNGA DEX! [Powered by Golden Shell]</span><span class="sub">v1.0</span></div>
   <div class="file-status" id="fileStatus"><span class="dot" id="statusDot"></span><span class="name" id="statusName">Ningún archivo cargado</span></div>
   <div class="hbtns">
-    <button class="btn small" id="btnOpen">Abrir JSON…</button>
-    <button class="btn small ghost" id="btnOpenFolder" title="Detectar automáticamente los JSON de la misma carpeta">Abrir carpeta</button>
     <button class="btn small ghost" id="btnExportCollection" title="Descargar SaveData.json">Guardar colección</button>
     <button class="btn small ghost" id="btnImportCollection" title="Cargar un SaveData.json exportado previamente">Importar colección</button>
-    <button class="btn small ghost" id="btnClearStorage" title="Borrar preferencias guardadas en este navegador">Limpiar almacenamiento</button>
     <button class="btn small ghost panel-toggle-btn" id="btnToggleSidebar" title="Mostrar/ocultar panel de colecciones">☰</button>
     <button class="btn small ghost panel-toggle-btn" id="btnToggleInspector" title="Mostrar/ocultar panel derecho">▤ Panel der.</button>
   </div>
-  <input type="file" id="fileInput" accept=".json,application/json">
+  <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
   <input type="file" id="collectionFileInput" accept=".json,application/json">
 </header>
 
@@ -2283,8 +2283,6 @@ document.querySelectorAll('.sb-tab').forEach(t=>{
   });
 });
 
-document.getElementById('btnOpen').addEventListener('click', ()=>document.getElementById('fileInput').click());
-document.getElementById('btnOpenFolder').addEventListener('click', openFolderAndLoad);
 document.getElementById('landingDrop').addEventListener('click', ()=>document.getElementById('fileInput').click());
 document.getElementById('fileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
 
@@ -2346,20 +2344,6 @@ document.getElementById('treeExpandAll').addEventListener('click', ()=>{
   document.querySelectorAll('#treePane .jt-toggle').forEach(t=>{ if(t.textContent==='▸') t.parentElement.click(); });
 });
 document.getElementById('treeCollapseAll').addEventListener('click', renderTree);
-
-document.getElementById('btnClearStorage').addEventListener('click', ()=>{
-  if(!confirm('Esto borrará tus preferencias Y tu colección física guardada en este navegador. ¿Continuar?')) return;
-  try{
-    localStorage.removeItem(COLLECTION_STATE_KEY);
-    localStorage.removeItem(COLLECTION_DATA_KEY);
-  }catch(e){}
-  S.collection = new Map();
-  S.preferences = { imageMode:'normal' };
-  applyImageModeUI();
-  if(Object.keys(S.categories).length) applyFiltersAndRender();
-  if(S.selectedItem) selectItem(S.selectedItem);
-  alert('Preferencias y colección locales borradas.');
-});
 
 document.getElementById('cpClose').addEventListener('click', closeCollectionPopover);
 document.getElementById('cpDone').addEventListener('click', closeCollectionPopover);
