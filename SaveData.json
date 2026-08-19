@@ -1725,6 +1725,71 @@
         }
       },
       "acquired": "2026-08-19"
+    },
+    "c17ea446-a1da-5431-b797-c97e22542fb2": {
+      "variants": {
+        "normal": {
+          "en": 5,
+          "other": 0
+        },
+        "foil": {
+          "en": 1,
+          "other": 0
+        }
+      },
+      "acquired": "2026-08-19"
+    },
+    "5b25bc03-476c-5d5c-8106-88ea771af67d": {
+      "variants": {
+        "normal": {
+          "en": 5,
+          "other": 0
+        },
+        "foil": {
+          "en": 1,
+          "other": 0
+        }
+      },
+      "acquired": "2026-08-19"
+    },
+    "5d508547-75cd-592a-b799-fe20ba3cd451": {
+      "variants": {
+        "normal": {
+          "en": 5,
+          "other": 0
+        },
+        "foil": {
+          "en": 2,
+          "other": 0
+        }
+      },
+      "acquired": "2026-08-19"
+    },
+    "f7624dde-fb71-5e9f-ae30-2ad0cd52a12c": {
+      "variants": {
+        "normal": {
+          "en": 5,
+          "other": 0
+        },
+        "foil": {
+          "en": 1,
+          "other": 0
+        }
+      },
+      "acquired": "2026-08-19"
+    },
+    "14f64b94-f901-52fb-ab37-4299a5e5b595": {
+      "variants": {
+        "normal": {
+          "en": 5,
+          "other": 0
+        },
+        "foil": {
+          "en": 1,
+          "other": 0
+        }
+      },
+      "acquired": "2026-08-19"
     }
   },
   "preferences": {
